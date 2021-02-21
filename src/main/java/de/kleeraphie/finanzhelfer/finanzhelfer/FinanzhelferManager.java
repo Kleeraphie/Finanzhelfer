@@ -23,7 +23,7 @@ public class FinanzhelferManager {
 	public static FinanzhelferManager load() {
 		FinanzhelferManager temp;
 
-		temp = Main.dataHandler.loadFromConfig();
+		temp = Main.dataHandler.loadFromDataFile();
 		return temp;
 	}
 
@@ -39,7 +39,7 @@ public class FinanzhelferManager {
 		// if (creating != null)
 		// abortCreating();
 
-		Main.dataHandler.saveInConfig(this);
+		Main.dataHandler.saveInData(this);
 	}
 
 	public void newFinanzhelfer() {
@@ -155,6 +155,31 @@ public class FinanzhelferManager {
 		return null;
 	}
 
+	// TODO: Button um das erneut zu überprüfen in den Einstellungen hinzufügen
+	public void checkRecurrentExpenditures() {
+
+		for (Finanzhelfer cF : fhList) {
+			for (Kategorie cK : cF.getCategories()) {
+				
+				for (Dauerauftrag cSO : cK.getStandingOrders()) {
+					if (cSO.getTimer() != null) {
+
+						while (cSO.hasHappened()) { // so oft ausführen, wie es noch nicht gemacht wurde
+
+							cK.addAusgabe(cSO.getExpenditure());
+							cSO.addDelay();
+
+						}
+
+					}
+				}
+
+			}
+
+		}
+
+	}
+
 	@Override
 	public String toString() {
 		String fhs;
@@ -174,8 +199,8 @@ public class FinanzhelferManager {
 		if (creating == null)
 			return "FinanzhelferManager[fhList: " + fhs + "]";
 		else
-			return "FinanzhelferManager[fhList:" + fhs + "; creating:" + creating.toString() + "; creatingCategorieList:"
-					+ creatingCategorieList.toString() + "]";
+			return "FinanzhelferManager[fhList:" + fhs + "; creating:" + creating.toString()
+					+ "; creatingCategorieList:" + creatingCategorieList.toString() + "]";
 	}
 
 }

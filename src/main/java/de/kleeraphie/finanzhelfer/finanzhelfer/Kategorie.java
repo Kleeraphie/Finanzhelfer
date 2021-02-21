@@ -1,5 +1,6 @@
 package de.kleeraphie.finanzhelfer.finanzhelfer;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import de.kleeraphie.finanzhelfer.main.Main;
@@ -9,6 +10,7 @@ public class Kategorie {
 	private String name, info;
 	private double totalMoney, moneyLeft;
 	private ArrayList<Ausgabe> expenditures;
+	private ArrayList<Dauerauftrag> standingOrders;
 	// TODO: vielleicht FH parent hinzufügen
 	
 	public Kategorie() {
@@ -20,7 +22,9 @@ public class Kategorie {
 		this.info = info;
 		this.totalMoney = money;
 		this.moneyLeft = this.totalMoney;
+		
 		this.expenditures = new ArrayList<>();
+		this.standingOrders = new ArrayList<>();
 	}
 	
 	public Kategorie(String name, double money) {
@@ -91,10 +95,22 @@ public class Kategorie {
 		addAusgabe(expenditure.getName(), expenditure.getInfo(), expenditure.getCost());
 	}
 	
-	public ArrayList<Ausgabe> getAusgaben() {
-		return expenditures;
+	public ArrayList<Dauerauftrag> getStandingOrders() {
+		return standingOrders;
+	}
+
+	public void setStandingOrders(ArrayList<Dauerauftrag> standingOrders) {
+		this.standingOrders = standingOrders;
 	}
 	
+	public void addStandingOrder(String name, String info, double cost, int delay, ChronoUnit unit) {
+		System.out.println("oldSize: " + standingOrders.size());
+		standingOrders.add(new Dauerauftrag(new Ausgabe(name, info, cost), delay, unit));
+		this.moneyLeft -= cost;
+		Main.fhm.getCurrent().updateMoneyLeft();
+		System.out.println("newSize: " + standingOrders.size());
+	}
+
 	@Override
 	public String toString() {
 		

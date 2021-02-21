@@ -1,11 +1,14 @@
 package de.kleeraphie.finanzhelfer.gui;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.Currency;
 import java.util.Locale;
 
@@ -15,6 +18,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -31,10 +35,13 @@ import de.kleeraphie.finanzhelfer.main.Main;
 public class AusgabenAdder extends JFrame {
 
 	private static final long serialVersionUID = -2761622587237851L;
-	private JComboBox<String> categories;
+	private JComboBox<String> categories, types, unit;
 	private JTextField name;
 	private JFormattedTextField cost;
 	private JTextArea info;
+	private JButton finish;
+	private JPanel howOftenEntries;
+	private JLabel howOften;
 	private GridBagConstraints c;
 	private Theme theme;
 
@@ -58,7 +65,7 @@ public class AusgabenAdder extends JFrame {
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setLayout(new GridBagLayout());
 		getContentPane().setBackground(theme.getBackgroundColor());
-		
+
 		UIManager.put("ComboBox.background", new ColorUIResource(theme.getFieldColor()));
 		// TODO: JOptionPane soll sich auch theme anpassen
 //		UIManager.put("OptionPane.background", new ColorUIResource(theme.getBackgroundColor()));
@@ -66,7 +73,7 @@ public class AusgabenAdder extends JFrame {
 	}
 
 	private void buildLabels() {
-		JLabel categorie, name, info, cost;
+		JLabel categorie, name, info, cost, type;
 
 		c.anchor = GridBagConstraints.CENTER;
 		c.weightx = 1;
@@ -89,6 +96,10 @@ public class AusgabenAdder extends JFrame {
 		cost = new JLabel("Kosten:");
 		add(cost, c);
 
+		c.gridy++;
+		type = new JLabel("Typ:");
+		add(type, c);
+
 	}
 
 	private void buildEntries() {
@@ -100,7 +111,7 @@ public class AusgabenAdder extends JFrame {
 		Currency currency = Currency.getInstance(Locale.GERMANY);
 		String symbol = currency.getSymbol(); // Währungssymbol
 		DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMANY);
-		
+
 		// TODO: rausfinden, wozu die einzelenen Formatter da sind
 		// create the formatters, default, display, edit
 		NumberFormatter defaultFormatter = new NumberFormatter(new DecimalFormat("#.##"));
@@ -117,17 +128,17 @@ public class AusgabenAdder extends JFrame {
 		// TODO: Mindestgröße setzen (wenn mgl. ohne px)
 		categories = new JComboBox<>();
 		categories.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"); // 30x x (aber 2px zu klein)
-		
+
 		for (Kategorie current : Main.fhm.getCurrent().getCategories())
 			categories.addItem(current.getName());
-		
+
 		// TODO: px-Reihe rechts & unten von Pfeilkasten entfernen
-				categories.setUI(new BasicComboBoxUI() {
-					protected JButton createArrowButton() { // TODO: eigene Farbe für den Pfeil erstellen
-						return new BasicArrowButton(BasicArrowButton.SOUTH, null, null, theme.getTaskBarColor(), null);
-					}
-				});
-		
+		categories.setUI(new BasicComboBoxUI() {
+			protected JButton createArrowButton() { // TODO: eigene Farbe für den Pfeil erstellen
+				return new BasicArrowButton(BasicArrowButton.SOUTH, null, null, theme.getTaskBarColor(), null);
+			}
+		});
+
 		add(categories, c);
 
 		c.gridy++;
@@ -146,7 +157,7 @@ public class AusgabenAdder extends JFrame {
 		sp.setBackground(theme.getTaskBarColor());
 		add(sp, c);
 		// TODO: bg-Color vom sp ändern
-		
+
 		c.gridy++;
 		cost = new JFormattedTextField(salaryFactory);
 		cost.setColumns(24);
@@ -154,21 +165,101 @@ public class AusgabenAdder extends JFrame {
 		cost.setBackground(theme.getFieldColor());
 		add(cost, c);
 
+		c.gridy++;
+		types = new JComboBox<>();
+		types.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"); // 30x x (aber 2px zu klein)
+
+		types.addItem("Einmalige Zahlung");
+		types.addItem("Dauerauftrag");
+
+		types.setUI(new BasicComboBoxUI() {
+			protected JButton createArrowButton() { // TODO: eigene Farbe für den Pfeil erstellen
+				return new BasicArrowButton(BasicArrowButton.SOUTH, null, null, theme.getTaskBarColor(), null);
+			}
+		});
+
+		types.addActionListener(new ActionListener() { // TODO: Funktioniert noch nicht
+			public void actionPerformed(ActionEvent e) {
+
+				if (types.getSelectedItem().toString().equals("Dauerauftrag")) {
+					JLabel all;
+					JFormattedTextField times;
+
+					// finish-Button entfernen
+					remove(finish);
+
+					c.gridwidth = 1;
+					c.gridx = 0; // da nun ein Label kommt
+					c.gridy++;
+
+					howOftenEntries = new JPanel(new FlowLayout(FlowLayout.LEFT));
+					howOftenEntries.setBackground(theme.getBackgroundColor());
+
+					howOften = new JLabel("Wie oft");
+					add(howOften, c);
+
+					c.gridx++; // da nun ein Entry kommt
+					all = new JLabel("Alle");
+					howOftenEntries.add(all);
+
+					NumberFormat format = NumberFormat.getInstance();
+					NumberFormatter formatter = new NumberFormatter(format);
+					formatter.setValueClass(Integer.class);
+					formatter.setMinimum(0);
+					formatter.setMaximum(Integer.MAX_VALUE);
+					formatter.setAllowsInvalid(false);
+					formatter.setCommitsOnValidEdit(true);
+
+					times = new JFormattedTextField(formatter);
+					times.setValue(0);
+					times.setColumns(2);
+					howOftenEntries.add(times);
+
+					unit = new JComboBox<>();
+
+					unit.addItem("Sekunden");
+					unit.addItem("Tage");
+					unit.addItem("Wochen");
+					unit.addItem("Monate"); // TODO: Timer setzen & dann auch Monate hinzufügen
+					unit.addItem("Jahre");
+
+					howOftenEntries.add(unit);
+
+					add(howOftenEntries, c);
+
+					buildButtons(); // finish-Button neu hinzufügen
+
+				} else {
+
+					if (howOften != null && howOftenEntries != null) {
+						remove(howOften);
+						remove(howOftenEntries);
+					}
+
+				}
+
+				revalidate();
+				repaint();
+
+			}
+		});
+
+		add(types, c);
+
 	}
 
 	private void buildButtons() {
-		JButton finish;
 
 		c.gridwidth = 2;
 		c.gridx = 0;
-		c.gridy = 4;
+		c.gridy++;
 
 		finish = new JButton("Fertigstellen");
-		
+
 		finish.setContentAreaFilled(false);
 		finish.setOpaque(true);
 		finish.setBackground(theme.getButtonColor());
-		
+
 		finish.addActionListener(new ActionListener() {
 
 			@Override
@@ -182,20 +273,52 @@ public class AusgabenAdder extends JFrame {
 	private void addAusgabe() {
 		Kategorie currentCategorie = Main.fhm.getCurrent().getCategorieByName((String) categories.getSelectedItem());
 		double money = Double.parseDouble(cost.getText().replace(".", "").replace(',', '.').replace('€', ' '));
-		
+
 		if (money > currentCategorie.getMoneyLeft()) {
-			String message = "Diese Ausgabe übersteigt das verbleibende Geld dieser Kategorie! (" + money + " € > " + currentCategorie.getMoneyLeft() + " €)";
-			
+			String message = "Diese Ausgabe übersteigt das verbleibende Geld dieser Kategorie! (" + money + " € > "
+					+ currentCategorie.getMoneyLeft() + " €)";
+
 			JOptionPane.showMessageDialog(this, message, "Fehler!", JOptionPane.WARNING_MESSAGE);
-			
+
 			return;
 		}
 
 		String selected = String.valueOf(categories.getSelectedItem());
 		Kategorie current = Main.fhm.getCurrent().getCategorieByName(selected);
 
+		if (types.getSelectedItem().toString().equals("Dauerauftrag")) {
+			int delay = ((int) ((JFormattedTextField) howOftenEntries.getComponent(1)).getValue());
+
+			System.out.println(unit.getSelectedItem().toString().equals("Sekunden"));
+
+			switch (unit.getSelectedItem().toString()) {
+
+			case "Sekunden":
+				current.addStandingOrder(name.getText(), info.getText(), money, delay, ChronoUnit.SECONDS);
+				System.out.println("T");
+				break;
+
+			case "Tage":
+				current.addStandingOrder(name.getText(), info.getText(), money, delay, ChronoUnit.DAYS);
+				break;
+
+			case "Wochen":
+				current.addStandingOrder(name.getText(), info.getText(), money, delay, ChronoUnit.WEEKS);
+				break;
+
+			case "Monate":
+				current.addStandingOrder(name.getText(), info.getText(), money, delay, ChronoUnit.MONTHS);
+				break;
+
+			case "Jahre":
+				current.addStandingOrder(name.getText(), info.getText(), money, delay, ChronoUnit.YEARS);
+				break;
+			}
+
+		}
+
 		current.addAusgabe(name.getText(), info.getText(), money);
-		
+
 		dispose();
 	}
 

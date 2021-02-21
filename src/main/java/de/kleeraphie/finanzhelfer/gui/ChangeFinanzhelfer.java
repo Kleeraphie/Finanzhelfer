@@ -104,6 +104,7 @@ public class ChangeFinanzhelfer extends JFrame {
 		right.setBackground(theme.getBackgroundColor());
 
 		// Placeholder so each JPanel is only using one third of the ContentPane
+		// TODO: zum funktionieren bringen
 		emptyBtn = new JButton();
 		emptyBtn.setVisible(false);
 

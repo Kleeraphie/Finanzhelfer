@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import javax.swing.JButton;
@@ -52,6 +54,8 @@ public class AusgabenList extends JFrame {
 
 		repaint();
 
+		// TODO: Erstellungsdatum hinzufügen
+		
 	}
 
 	// @Override
@@ -124,8 +128,8 @@ public class AusgabenList extends JFrame {
 	}
 
 	private void buildCells() {
-		JLabel currentMoneyLabel, currentInfoLabel; // nur der Name
-		JLabel textFor, currentName, currentMoney; // die Infos
+		JLabel currentMoneyLabel, currentInfoLabel, created; // nur der Name
+		JLabel textFor, currentName, currentMoney, creationDate; // die Infos
 		JTextArea currentInfo;
 		JComboBox<String> categories;
 		Ausgabe currentAusgabe;
@@ -216,13 +220,15 @@ public class AusgabenList extends JFrame {
 
 				c.anchor = GridBagConstraints.CENTER;
 
-				currentAusgabe = currentCategorie.getAusgaben().get(9 * (currentPage - 1) + i);
+				currentAusgabe = currentCategorie.getExpenditures().get(9 * (currentPage - 1) + i);
 
 				currentMoneyLabel = new JLabel();
 				currentInfoLabel = new JLabel();
+				created = new JLabel();
 
 				currentName = new JLabel();
 				currentMoney = new JLabel();
+				creationDate = new JLabel();
 
 				currentInfo = new JTextArea(2, 10);
 
@@ -236,14 +242,21 @@ public class AusgabenList extends JFrame {
 				currentName.setFont(new Font(fett.getFontName(), fett.getStyle(), 12));
 				currentMoneyLabel.setFont(fett);
 				currentInfoLabel.setFont(fett);
+				created.setFont(fett);
 
 				currentMoneyLabel.setText("Kosten:");
 				currentInfoLabel.setText("Info:");
+				created.setText("Erstellt am:");
 
 				currentName.setText(currentAusgabe.getName());
 				// TODO: Währungssymbol in Config änderbar
 				currentMoney.setText(String.valueOf(moneyFormat.format(currentAusgabe.getCost())) + " €");
 				currentInfo.setText(currentAusgabe.getInfo());
+				
+				// TODO: Locale aus der Config nehmen
+				DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.GERMANY);
+				
+				creationDate.setText(currentAusgabe.getCreationDate().format(formatter));
 
 				c.gridwidth = 2;
 				c.gridx = 0;
@@ -271,6 +284,9 @@ public class AusgabenList extends JFrame {
 				c.gridy++;
 				cell.add(currentInfoLabel, c);
 
+				c.gridy++;
+				cell.add(created, c);
+				
 				c.gridx = 1;
 				c.gridy = 1;
 
@@ -283,6 +299,9 @@ public class AusgabenList extends JFrame {
 
 				c.gridy++;
 				cell.add(currentInfo, c);
+				
+				c.gridy++;
+				cell.add(creationDate, c);
 
 				if (i < 3) // TODO: vllt. durch (int) i/3 (switchcase) kürzer
 					left.add(cell);
@@ -316,7 +335,7 @@ public class AusgabenList extends JFrame {
 		btnPanel = new JPanel(new GridBagLayout());
 		btnPanel.setBackground(theme.getBackgroundColor());
 
-		if (currentPage == pages || currentCategorie.getAusgaben().isEmpty()) {
+		if (currentPage == pages || currentCategorie.getExpenditures().isEmpty()) {
 			// funktioniert auch wenn beide = 1, d.h. wenn <= 8 Sparten konfiguriert werden
 
 			finish = new JButton("OK");
@@ -371,7 +390,7 @@ public class AusgabenList extends JFrame {
 		if (currentCategorie == null)
 			currentCategorie = Main.fhm.getCurrent().getCategories()[0];
 
-		ausgabenAmount = currentCategorie.getAusgaben().size();
+		ausgabenAmount = currentCategorie.getExpenditures().size();
 
 		return ausgabenAmount;
 
