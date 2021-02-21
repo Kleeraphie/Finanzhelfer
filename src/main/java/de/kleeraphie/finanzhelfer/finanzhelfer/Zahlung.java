@@ -3,13 +3,13 @@ package de.kleeraphie.finanzhelfer.finanzhelfer;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-public class Ausgabe {
+public class Zahlung {
 
 	private String name, info;
 	private double cost;
-	private LocalDateTime creation, timer;
+	private LocalDateTime creation;
 
-	public Ausgabe(String name, String info, double cost) {
+	public Zahlung(String name, String info, double cost) {
 		this.name = name;
 		this.info = info;
 		this.cost = cost;
@@ -17,7 +17,7 @@ public class Ausgabe {
 		creation = LocalDateTime.now(ZoneId.systemDefault());
 	}
 
-	public Ausgabe(String name, double cost) {
+	public Zahlung(String name, double cost) {
 		this(name, null, cost);
 	}
 
@@ -49,13 +49,13 @@ public class Ausgabe {
 		return creation;
 	}
 
-	public LocalDateTime getTimer() {
-		return timer;
-	}
-
 	@Override
 	public String toString() {
-		return "Ausgabe[name:" + name + "; info:" + info + "; cost:" + cost + "]";
+		// TODO: Zahlungen == 0 verbieten
+		if (cost > 0)
+			return "Einnahme[name:" + name + "; info:" + info + "; cost:" + cost + "; creation:" + creation + "]";
+		else
+			return "Ausgabe[name:" + name + "; info:" + info + "; cost:" + cost + "; creation:" + creation + "]";
 	}
 
 }
