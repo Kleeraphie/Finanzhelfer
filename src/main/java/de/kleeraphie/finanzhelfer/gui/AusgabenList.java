@@ -27,7 +27,7 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.basic.BasicArrowButton;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 
-import de.kleeraphie.finanzhelfer.finanzhelfer.Ausgabe;
+import de.kleeraphie.finanzhelfer.finanzhelfer.Zahlung;
 import de.kleeraphie.finanzhelfer.finanzhelfer.Kategorie;
 import de.kleeraphie.finanzhelfer.main.Main;
 
@@ -44,6 +44,9 @@ public class AusgabenList extends JFrame {
 
 	public AusgabenList() {
 
+		// TODO: Zahlung eines Auftrags in eine Zahlung zusammenfassen
+		// TODO: Anzahl der Seiten im nächsten Seite Button anzeigen (& zurück Seite)
+		
 		currentPage = 1;
 		c = new GridBagConstraints();
 		theme = Main.theme; // TODO: vllt. wie DataHandler nie eine Instanz erstellen
@@ -55,7 +58,7 @@ public class AusgabenList extends JFrame {
 		repaint();
 
 		// TODO: Erstellungsdatum hinzufügen
-		
+
 	}
 
 	// @Override
@@ -132,7 +135,7 @@ public class AusgabenList extends JFrame {
 		JLabel textFor, currentName, currentMoney, creationDate; // die Infos
 		JTextArea currentInfo;
 		JComboBox<String> categories;
-		Ausgabe currentAusgabe;
+		Zahlung currentAusgabe;
 		Font fett;
 		DecimalFormat moneyFormat;
 		DecimalFormatSymbols symbols;
@@ -185,7 +188,8 @@ public class AusgabenList extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				currentCategorie = Main.fhm.getCurrent().getCategorieByName(categories.getSelectedItem().toString());
 
-				// Werte neu berechnen, damit sie mit den Werten der neuen Kategorie übereinstimmen
+				// Werte neu berechnen, damit sie mit den Werten der neuen Kategorie
+				// übereinstimmen
 				ausgabenAmount = getAusgabenAmount();
 				pages = (int) Math.ceil((double) ausgabenAmount / 9);
 
@@ -220,7 +224,7 @@ public class AusgabenList extends JFrame {
 
 				c.anchor = GridBagConstraints.CENTER;
 
-				currentAusgabe = currentCategorie.getExpenditures().get(9 * (currentPage - 1) + i);
+				currentAusgabe = currentCategorie.getPayments().get(9 * (currentPage - 1) + i);
 
 				currentMoneyLabel = new JLabel();
 				currentInfoLabel = new JLabel();
@@ -244,7 +248,7 @@ public class AusgabenList extends JFrame {
 				currentInfoLabel.setFont(fett);
 				created.setFont(fett);
 
-				currentMoneyLabel.setText("Kosten:");
+				currentMoneyLabel.setText("Betrag:");
 				currentInfoLabel.setText("Info:");
 				created.setText("Erstellt am:");
 
@@ -252,10 +256,11 @@ public class AusgabenList extends JFrame {
 				// TODO: Währungssymbol in Config änderbar
 				currentMoney.setText(String.valueOf(moneyFormat.format(currentAusgabe.getCost())) + " €");
 				currentInfo.setText(currentAusgabe.getInfo());
-				
+
 				// TODO: Locale aus der Config nehmen
-				DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.GERMANY);
-				
+				DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+						.withLocale(Locale.GERMANY);
+
 				creationDate.setText(currentAusgabe.getCreationDate().format(formatter));
 
 				c.gridwidth = 2;
@@ -286,7 +291,7 @@ public class AusgabenList extends JFrame {
 
 				c.gridy++;
 				cell.add(created, c);
-				
+
 				c.gridx = 1;
 				c.gridy = 1;
 
@@ -299,7 +304,7 @@ public class AusgabenList extends JFrame {
 
 				c.gridy++;
 				cell.add(currentInfo, c);
-				
+
 				c.gridy++;
 				cell.add(creationDate, c);
 
@@ -324,54 +329,86 @@ public class AusgabenList extends JFrame {
 	}
 
 	private void buildButtons() {
-		JButton finish, nextPage;
-		JPanel btnPanel;
+		JButton pageBefore, nextPage, finish;
+		JPanel southPanel, btnPanel;
 
 		c.anchor = GridBagConstraints.CENTER;
 		c.gridx = 0;
 		c.gridy = 0;
 		c.insets = new Insets(0, 0, 20, 0);
 
-		btnPanel = new JPanel(new GridBagLayout());
+		southPanel = new JPanel(new GridBagLayout());
+		southPanel.setBackground(theme.getBackgroundColor());
+
+		btnPanel = new JPanel(new FlowLayout());
 		btnPanel.setBackground(theme.getBackgroundColor());
 
-		if (currentPage == pages || currentCategorie.getExpenditures().isEmpty()) {
-			// funktioniert auch wenn beide = 1, d.h. wenn <= 8 Sparten konfiguriert werden
+		pageBefore = new JButton("Seite zurück");
 
-			finish = new JButton("OK");
+		pageBefore.setContentAreaFilled(false);
+		pageBefore.setOpaque(true);
+		pageBefore.setBackground(theme.getButtonColor());
 
-			finish.setContentAreaFilled(false);
-			finish.setOpaque(true);
-			finish.setBackground(theme.getButtonColor());
+		pageBefore.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pageBefore();
+			}
+		});
+		
+		if (currentPage == 1)
+			pageBefore.setEnabled(false);
+		
+		btnPanel.add(pageBefore);
+		
+		nextPage = new JButton("Nächste Seite");
 
-			finish.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					dispose();
-				}
-			});
-			btnPanel.add(finish, c);
+		nextPage.setContentAreaFilled(false);
+		nextPage.setOpaque(true);
+		nextPage.setBackground(theme.getButtonColor());
 
-		} else {
+		nextPage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				nextPage();
+			}
+		});
+		
+		if (currentPage == pages)
+			nextPage.setEnabled(false);
+		
+		btnPanel.add(nextPage);
 
-			nextPage = new JButton("Weiter");
+		finish = new JButton("OK");
 
-			nextPage.setContentAreaFilled(false);
-			nextPage.setOpaque(true);
-			nextPage.setBackground(theme.getButtonColor());
+		finish.setContentAreaFilled(false);
+		finish.setOpaque(true);
+		finish.setBackground(theme.getButtonColor());
 
-			nextPage.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					nextPage();
-				}
-			});
-			btnPanel.add(nextPage, c);
-		}
+		finish.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
+		btnPanel.add(finish);
 
-		add(btnPanel, BorderLayout.SOUTH);
+		southPanel.add(btnPanel, c);
+		add(southPanel, BorderLayout.SOUTH);
 	}
 
+	private void pageBefore() {
+		currentPage--;
+
+		getContentPane().removeAll();
+
+		buildCells();
+		buildButtons();
+
+		revalidate();
+		repaint();
+	}
+	
 	private void nextPage() {
 		currentPage++;
 
@@ -379,7 +416,7 @@ public class AusgabenList extends JFrame {
 
 		buildCells();
 		buildButtons();
-		
+
 		revalidate();
 		repaint();
 	}
@@ -390,7 +427,7 @@ public class AusgabenList extends JFrame {
 		if (currentCategorie == null)
 			currentCategorie = Main.fhm.getCurrent().getCategories()[0];
 
-		ausgabenAmount = currentCategorie.getExpenditures().size();
+		ausgabenAmount = currentCategorie.getPayments().size();
 
 		return ausgabenAmount;
 
