@@ -377,11 +377,11 @@ public class AusgabenList extends JFrame {
 
 		getContentPane().removeAll();
 
-		revalidate();
-		repaint();
-
 		buildCells();
 		buildButtons();
+		
+		revalidate();
+		repaint();
 	}
 
 	private int getAusgabenAmount() {
