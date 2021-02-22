@@ -153,13 +153,12 @@ public class MainWindow extends JFrame {
 			else
 				newExpenditure.setLocation(175, 25);
 
-			newExpenditure.setToolTipText("Neue Ausgabe hinzufügen");
+			newExpenditure.setToolTipText("Neue Payment hinzufügen");
 			newExpenditure.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					new AusgabenAdder();
-					System.out.println(Main.fhm.getCurrent());
 				}
 			});
 
