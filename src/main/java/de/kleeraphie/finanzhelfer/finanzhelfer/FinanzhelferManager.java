@@ -166,7 +166,7 @@ public class FinanzhelferManager {
 
 						while (cSO.hasHappened()) { // so oft ausführen, wie es noch nicht gemacht wurde
 
-							cK.addAusgabe(cSO.getExpenditure());
+							cK.addPayment(cSO.getPayment());
 							cSO.addDelay();
 
 						}

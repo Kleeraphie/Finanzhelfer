@@ -30,12 +30,13 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
 import de.kleeraphie.finanzhelfer.finanzhelfer.Kategorie;
+import de.kleeraphie.finanzhelfer.finanzhelfer.Zahlung;
 import de.kleeraphie.finanzhelfer.main.Main;
 
 public class AusgabenAdder extends JFrame {
 
 	private static final long serialVersionUID = -2761622587237851L;
-	private JComboBox<String> categories, types, unit;
+	private JComboBox<String> categories, timesTypes, unit, types;
 	private JTextField name;
 	private JFormattedTextField cost;
 	private JTextArea info;
@@ -58,7 +59,7 @@ public class AusgabenAdder extends JFrame {
 	}
 
 	private void buildWindow() {
-		setTitle("Neue Ausgabe hinzufügen");
+		setTitle("Neue Zahlung hinzufügen");
 		setSize(900, 650);
 		setLocationRelativeTo(null);
 		requestFocus();
@@ -73,7 +74,7 @@ public class AusgabenAdder extends JFrame {
 	}
 
 	private void buildLabels() {
-		JLabel categorie, name, info, cost, type;
+		JLabel categorie, name, info, cost, times, paymentType;
 
 		c.anchor = GridBagConstraints.CENTER;
 		c.weightx = 1;
@@ -84,6 +85,10 @@ public class AusgabenAdder extends JFrame {
 		categorie = new JLabel("Kategorie:");
 		add(categorie, c);
 
+		c.gridy++;
+		paymentType = new JLabel("Zahlungstyp:");
+		add(paymentType, c);
+		
 		c.gridy++;
 		name = new JLabel("Name:");
 		add(name, c);
@@ -97,8 +102,8 @@ public class AusgabenAdder extends JFrame {
 		add(cost, c);
 
 		c.gridy++;
-		type = new JLabel("Typ:");
-		add(type, c);
+		times = new JLabel("Typ:");
+		add(times, c);
 
 	}
 
@@ -140,6 +145,22 @@ public class AusgabenAdder extends JFrame {
 		});
 
 		add(categories, c);
+		categories.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+		
+		c.gridy++;
+		types = new JComboBox<String>();
+		types.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+		
+		types.addItem("Ausgabe");
+		types.addItem("Einnahme");
+		
+		types.setUI(new BasicComboBoxUI() {
+			protected JButton createArrowButton() { // TODO: eigene Farbe für den Pfeil erstellen
+				return new BasicArrowButton(BasicArrowButton.SOUTH, null, null, theme.getTaskBarColor(), null);
+			}
+		});
+		
+		add(types, c);
 
 		c.gridy++;
 		name = new JTextField(24);
@@ -166,22 +187,22 @@ public class AusgabenAdder extends JFrame {
 		add(cost, c);
 
 		c.gridy++;
-		types = new JComboBox<>();
-		types.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"); // 30x x (aber 2px zu klein)
+		timesTypes = new JComboBox<>();
+		timesTypes.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"); // 30x x (aber 2px zu klein)
 
-		types.addItem("Einmalige Zahlung");
-		types.addItem("Dauerauftrag");
+		timesTypes.addItem("Einmalige Zahlung");
+		timesTypes.addItem("Dauerauftrag");
 
-		types.setUI(new BasicComboBoxUI() {
+		timesTypes.setUI(new BasicComboBoxUI() {
 			protected JButton createArrowButton() { // TODO: eigene Farbe für den Pfeil erstellen
 				return new BasicArrowButton(BasicArrowButton.SOUTH, null, null, theme.getTaskBarColor(), null);
 			}
 		});
 
-		types.addActionListener(new ActionListener() { // TODO: Funktioniert noch nicht
+		timesTypes.addActionListener(new ActionListener() { // TODO: Funktioniert noch nicht
 			public void actionPerformed(ActionEvent e) {
 
-				if (types.getSelectedItem().toString().equals("Dauerauftrag")) {
+				if (timesTypes.getSelectedItem().toString().equals("Dauerauftrag")) {
 					JLabel all;
 					JFormattedTextField times;
 
@@ -217,10 +238,9 @@ public class AusgabenAdder extends JFrame {
 
 					unit = new JComboBox<>();
 
-					unit.addItem("Sekunden");
 					unit.addItem("Tage");
 					unit.addItem("Wochen");
-					unit.addItem("Monate"); // TODO: Timer setzen & dann auch Monate hinzufügen
+					unit.addItem("Monate");
 					unit.addItem("Jahre");
 
 					howOftenEntries.add(unit);
@@ -244,7 +264,7 @@ public class AusgabenAdder extends JFrame {
 			}
 		});
 
-		add(types, c);
+		add(timesTypes, c);
 
 	}
 
@@ -274,8 +294,15 @@ public class AusgabenAdder extends JFrame {
 		Kategorie currentCategorie = Main.fhm.getCurrent().getCategorieByName((String) categories.getSelectedItem());
 		double money = Double.parseDouble(cost.getText().replace(".", "").replace(',', '.').replace('€', ' '));
 
+		if (types.getSelectedItem().toString().equals("Ausgabe")) {
+			money  = -money;
+		}
+			
+		
+		Zahlung payment = new Zahlung(name.getText(), info.getText(), money);
+		
 		if (money > currentCategorie.getMoneyLeft()) {
-			String message = "Diese Ausgabe übersteigt das verbleibende Geld dieser Kategorie! (" + money + " € > "
+			String message = "Diese Payment übersteigt das verbleibende Geld dieser Kategorie! (" + money + " € > "
 					+ currentCategorie.getMoneyLeft() + " €)";
 
 			JOptionPane.showMessageDialog(this, message, "Fehler!", JOptionPane.WARNING_MESSAGE);
@@ -286,38 +313,31 @@ public class AusgabenAdder extends JFrame {
 		String selected = String.valueOf(categories.getSelectedItem());
 		Kategorie current = Main.fhm.getCurrent().getCategorieByName(selected);
 
-		if (types.getSelectedItem().toString().equals("Dauerauftrag")) {
+		if (timesTypes.getSelectedItem().toString().equals("Dauerauftrag")) {
 			int delay = ((int) ((JFormattedTextField) howOftenEntries.getComponent(1)).getValue());
-
-			System.out.println(unit.getSelectedItem().toString().equals("Sekunden"));
 
 			switch (unit.getSelectedItem().toString()) {
 
-			case "Sekunden":
-				current.addStandingOrder(name.getText(), info.getText(), money, delay, ChronoUnit.SECONDS);
-				System.out.println("T");
-				break;
-
 			case "Tage":
-				current.addStandingOrder(name.getText(), info.getText(), money, delay, ChronoUnit.DAYS);
+				current.addStandingOrder(payment, delay, ChronoUnit.DAYS);
 				break;
 
 			case "Wochen":
-				current.addStandingOrder(name.getText(), info.getText(), money, delay, ChronoUnit.WEEKS);
+				current.addStandingOrder(payment, delay, ChronoUnit.WEEKS);
 				break;
 
 			case "Monate":
-				current.addStandingOrder(name.getText(), info.getText(), money, delay, ChronoUnit.MONTHS);
+				current.addStandingOrder(payment, delay, ChronoUnit.MONTHS);
 				break;
 
 			case "Jahre":
-				current.addStandingOrder(name.getText(), info.getText(), money, delay, ChronoUnit.YEARS);
+				current.addStandingOrder(payment, delay, ChronoUnit.YEARS);
 				break;
 			}
 
 		}
 
-		current.addAusgabe(name.getText(), info.getText(), money);
+		current.addPayment(payment);
 
 		dispose();
 	}
