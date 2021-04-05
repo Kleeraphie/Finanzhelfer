@@ -316,11 +316,11 @@ public class CategoriesConfigurator extends JFrame {
 
 		getContentPane().removeAll();
 
-		revalidate();
-		repaint();
-
 		buildCells();
 		buildButtons();
+		
+		revalidate();
+		repaint();
 	}
 
 }
