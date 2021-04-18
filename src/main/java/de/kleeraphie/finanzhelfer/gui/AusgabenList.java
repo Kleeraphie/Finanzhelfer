@@ -28,6 +28,7 @@ import javax.swing.plaf.basic.BasicArrowButton;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 
 import de.kleeraphie.finanzhelfer.finanzhelfer.Zahlung;
+import de.kleeraphie.finanzhelfer.config.DataHandler;
 import de.kleeraphie.finanzhelfer.finanzhelfer.Kategorie;
 import de.kleeraphie.finanzhelfer.main.Main;
 
@@ -41,24 +42,27 @@ public class AusgabenList extends JFrame {
 	private Kategorie currentCategorie;
 	private GridBagConstraints c;
 	private Theme theme;
+	private DataHandler dataHandler;
+	private Locale loc;
 
 	public AusgabenList() {
 
 		// TODO: Zahlung eines Auftrags in eine Zahlung zusammenfassen
 		// TODO: Anzahl der Seiten im nächsten Seite Button anzeigen (& zurück Seite)
-		
+
 		currentPage = 1;
+
+		if (pages == 0)
+			pages = 1; // damit man bei nur einer Seite nicht auf nächste Seite klicken kann
+
 		c = new GridBagConstraints();
 		theme = Main.theme; // TODO: vllt. wie DataHandler nie eine Instanz erstellen
+		dataHandler = Main.dataHandler;
+		loc = Locale.forLanguageTag(dataHandler.getText("language.locale"));
 
 		buildWindow();
 		buildCells();
 		buildButtons();
-
-		repaint();
-
-		// TODO: Erstellungsdatum hinzufügen
-
 	}
 
 	// @Override
@@ -116,7 +120,7 @@ public class AusgabenList extends JFrame {
 
 	private void buildWindow() {
 
-		setTitle("Liste der Ausgaben");
+		setTitle(dataHandler.getText("windows.list.title"));
 		setSize(900, 650);
 		setLocationRelativeTo(Main.window);
 		requestFocus();
@@ -145,7 +149,7 @@ public class AusgabenList extends JFrame {
 
 		fett = new Font(new JLabel().getFont().getFontName(), Font.BOLD, new JLabel().getFont().getSize());
 
-		symbols = new DecimalFormatSymbols(Locale.GERMANY);
+		symbols = new DecimalFormatSymbols(loc);
 
 		// TODO: wenn z.B. 5,6€, dann 5,60€ ausgeben
 		moneyFormat = new DecimalFormat("#,##0.##", symbols);
@@ -158,7 +162,7 @@ public class AusgabenList extends JFrame {
 
 		textFor = new JLabel();
 		textFor.setFont(new Font(fett.getFontName(), Font.BOLD, 20));
-		textFor.setText("Ausgaben für:");
+		textFor.setText(dataHandler.getText("windows.list.labels.expenditure"));
 
 		top.add(textFor);
 
@@ -248,18 +252,18 @@ public class AusgabenList extends JFrame {
 				currentInfoLabel.setFont(fett);
 				created.setFont(fett);
 
-				currentMoneyLabel.setText("Betrag:");
-				currentInfoLabel.setText("Info:");
-				created.setText("Erstellt am:");
+				currentMoneyLabel.setText(dataHandler.getText("windows.list.labels.money"));
+				currentInfoLabel.setText(dataHandler.getText("windows.list.labels.info"));
+				created.setText(dataHandler.getText("windows.list.labels.date"));
 
 				currentName.setText(currentAusgabe.getName());
 				// TODO: Währungssymbol in Config änderbar
-				currentMoney.setText(String.valueOf(moneyFormat.format(currentAusgabe.getCost())) + " €");
+				currentMoney.setText(String.valueOf(moneyFormat.format(currentAusgabe.getCost())) + " "
+						+ dataHandler.getText("currency.symbol1")); // TODO: auch zu currency.getSymbol ändern
 				currentInfo.setText(currentAusgabe.getInfo());
 
 				// TODO: Locale aus der Config nehmen
-				DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
-						.withLocale(Locale.GERMANY);
+				DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(loc);
 
 				creationDate.setText(currentAusgabe.getCreationDate().format(formatter));
 
@@ -343,7 +347,7 @@ public class AusgabenList extends JFrame {
 		btnPanel = new JPanel(new FlowLayout());
 		btnPanel.setBackground(theme.getBackgroundColor());
 
-		pageBefore = new JButton("Seite zurück");
+		pageBefore = new JButton(dataHandler.getText("windows.list.buttons.pageBefore"));
 
 		pageBefore.setContentAreaFilled(false);
 		pageBefore.setOpaque(true);
@@ -355,13 +359,13 @@ public class AusgabenList extends JFrame {
 				pageBefore();
 			}
 		});
-		
+
 		if (currentPage == 1)
 			pageBefore.setEnabled(false);
-		
+
 		btnPanel.add(pageBefore);
-		
-		nextPage = new JButton("Nächste Seite");
+
+		nextPage = new JButton(dataHandler.getText("windows.list.buttons.nextPage"));
 
 		nextPage.setContentAreaFilled(false);
 		nextPage.setOpaque(true);
@@ -373,13 +377,13 @@ public class AusgabenList extends JFrame {
 				nextPage();
 			}
 		});
-		
+
 		if (currentPage == pages)
 			nextPage.setEnabled(false);
-		
+
 		btnPanel.add(nextPage);
 
-		finish = new JButton("OK");
+		finish = new JButton(dataHandler.getText("windows.list.buttons.finish"));
 
 		finish.setContentAreaFilled(false);
 		finish.setOpaque(true);
@@ -408,7 +412,7 @@ public class AusgabenList extends JFrame {
 		revalidate();
 		repaint();
 	}
-	
+
 	private void nextPage() {
 		currentPage++;
 

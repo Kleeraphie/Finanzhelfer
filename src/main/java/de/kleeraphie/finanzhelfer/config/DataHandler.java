@@ -21,6 +21,8 @@ public class DataHandler {
 	private File data, config, langDir;
 	private HashMap<String, String> currentLangTexts;
 
+	// TODO: Mehrzahl bei Währung beachten
+	
 	public DataHandler() {
 		gson = new Gson();
 		data = new File("files/data.json");
@@ -168,7 +170,7 @@ public class DataHandler {
 
 			currentLangCode = currentLang.getName().replace(".yml", "");
 
-			result.add(loadLanguageFile(currentLangCode).get("language." + currentLangCode));
+			result.add(loadLanguageFile(currentLangCode).get("language.name"));
 
 		}
 
@@ -192,7 +194,7 @@ public class DataHandler {
 					continue;
 				}
 
-				texts = line.split(":");
+				texts = line.split(":", 2);
 
 				if (texts.length == 2)
 					texts[1] = texts[1].trim(); // da am Anfang ein Leerzeichen ist
@@ -214,7 +216,7 @@ public class DataHandler {
 					path = texts[0];
 
 				if (texts.length > 1) // == 2
-					result.put(path, texts[1]);
+					result.put(path, replace(texts[1]));
 
 				oldTabs = newTabs;
 
@@ -258,6 +260,14 @@ public class DataHandler {
 		}
 
 		return index;
+	}
+
+//	benutzt um in result den text zu packen um mehrzeilige Nachrichten zu machen -> hat nicht funktioniert
+	private String replace(String string) {
+		
+		string = string.replaceAll("\\\\n", System.lineSeparator()); // \\\\n = \\n = \n; wenn nur replace() dann \\n
+		
+		return string;
 	}
 
 }

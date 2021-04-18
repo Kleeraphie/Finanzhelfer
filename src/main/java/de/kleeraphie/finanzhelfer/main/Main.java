@@ -25,7 +25,7 @@ public class Main {
 
 		dataHandler = new DataHandler();
 		
-		dataHandler.loadConfig();
+//		dataHandler.loadConfig();
 
 		// Trying to load fhm from config
 		// if fhm is null, then new fhm will be created
@@ -38,7 +38,7 @@ public class Main {
 
 		// TODO: später in Config einstellbar und aus ConfigManager mit getter lesen
 		theme = Theme.LIGHT_THEME;
-
+		
 		window = new MainWindow();
 
 	}

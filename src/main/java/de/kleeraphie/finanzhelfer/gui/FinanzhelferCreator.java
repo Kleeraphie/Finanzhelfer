@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
+import de.kleeraphie.finanzhelfer.config.DataHandler;
 import de.kleeraphie.finanzhelfer.finanzhelfer.FinanzhelferManager;
 import de.kleeraphie.finanzhelfer.finanzhelfer.Kategorie;
 import de.kleeraphie.finanzhelfer.main.Main;
@@ -31,23 +32,30 @@ public class FinanzhelferCreator extends JFrame {
 
 	private static final long serialVersionUID = 8129578661521034757L;
 	private FinanzhelferManager fhm;
-	private JTextField name, kategrien;
+	private JTextField name, kategorien;
 	private JFormattedTextField money;
 	private ArrayList<JTextField> fields;
 	private GridBagConstraints c;
 	private Theme theme;
+	private DataHandler dataHandler;
+	private Locale loc;
 
 	public FinanzhelferCreator() {
-		
+
 		theme = Main.theme;
+		dataHandler = Main.dataHandler;
+		loc = Locale.forLanguageTag(dataHandler.getText("language.locale"));
+
+		JOptionPane.setDefaultLocale(Locale.GERMANY);
 
 		// TODO: Werte werden nicht gespeichert aus vorheriger session wenn man nicht
 		// bei CategoriesConfigurator war
 		if (Main.fhm.creating != null) {
 			// TODO: einzelnen Werte der Kategorien oder von dem davor gespeichert
 			// & dann wieder eingetragen werden
+			// TODO: Text zentrieren
 			int input = JOptionPane.showConfirmDialog(Main.window,
-					"Ein neuer Finanzhelfer wurde nicht fertig erstellt. Wollen Sie diesen weiter bearbeiten?");
+					dataHandler.getText("windows.creating.dialogues.notFinishedExists"));
 
 			switch (input) {
 			case JOptionPane.YES_OPTION:
@@ -65,8 +73,8 @@ public class FinanzhelferCreator extends JFrame {
 			case JOptionPane.CANCEL_OPTION: // Abbrechen
 				return;
 
-			default:
-				break;
+			default: // wenn man auf das Kreuz drückt
+				return;
 			}
 
 		}
@@ -88,7 +96,7 @@ public class FinanzhelferCreator extends JFrame {
 
 	private void buildWindow() {
 
-		setTitle("Neuen Finanzhelfer erstellen");
+		setTitle(dataHandler.getText("windows.creating.title"));
 		setSize(800, 600);
 		setLocationRelativeTo(Main.window);
 		requestFocus();
@@ -103,7 +111,7 @@ public class FinanzhelferCreator extends JFrame {
 		});
 
 		setMinimumSize(new Dimension(800, 450));
-		
+
 		setVisible(true);
 
 	}
@@ -116,21 +124,21 @@ public class FinanzhelferCreator extends JFrame {
 		c.weightx = 1;
 		c.weighty = 1;
 
-		name = new JLabel("Name:");
+		name = new JLabel(dataHandler.getText("windows.creating.labels.name"));
 
 		c.gridx = 0;
 		c.gridy = 0;
 
 		add(name, c);
 
-		money = new JLabel("Gehalt:");
+		money = new JLabel(dataHandler.getText("windows.creating.labels.money"));
 
 		c.gridx = 0;
 		c.gridy = 1;
 
 		add(money, c);
 
-		categories = new JLabel("Anzahl an Kategorien:");
+		categories = new JLabel(dataHandler.getText("windows.creating.labels.categories"));
 
 		c.gridx = 0;
 		c.gridy = 2;
@@ -139,15 +147,15 @@ public class FinanzhelferCreator extends JFrame {
 	}
 
 	private void buildTextFields() {
-		DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMANY);
+		DecimalFormatSymbols symbols = new DecimalFormatSymbols(loc);
 
-		//TODO: Ränder um Fields entfernen oder schwarz machen (vlt. besser)
-		
+		// TODO: Ränder um Fields entfernen oder schwarz machen (vllt. besser)
+
 		// TODO: In Einstellungen Währung änderbar
-		Currency currency = Currency.getInstance(Locale.GERMANY);
+		Currency currency = Currency.getInstance(loc);
 		String symbol = currency.getSymbol(); // Währungssymbol
 
-		// TODO: rausfinden, wozu die einzelenen Formatter da sind
+		// TODO: rausfinden, wozu die einzelnen Formatter da sind
 		// create the formatters, default, display, edit
 		NumberFormatter defaultFormatter = new NumberFormatter(new DecimalFormat("#.##"));
 		NumberFormatter displayFormatter = new NumberFormatter(new DecimalFormat("#,##0.## " + symbol, symbols));
@@ -183,12 +191,12 @@ public class FinanzhelferCreator extends JFrame {
 			c.gridy++;
 			add(money, c);
 
-			kategrien = new JTextField(24);
-			kategrien.setBackground(theme.getFieldColor());
-			fields.add(kategrien);
-			
+			kategorien = new JTextField(24);
+			kategorien.setBackground(theme.getFieldColor());
+			fields.add(kategorien);
+
 			c.gridy++;
-			add(kategrien, c);
+			add(kategorien, c);
 
 		} else { // durch WarnMessage wieder hier
 			for (JTextField field : fields)
@@ -197,10 +205,11 @@ public class FinanzhelferCreator extends JFrame {
 
 	}
 
+	// TODO: Abbrechen hinzufügen
 	private void buildButtons() {
 		JButton nextPage;
 
-		nextPage = new JButton("Weiter");
+		nextPage = new JButton(dataHandler.getText("windows.creating.buttons.nextPage"));
 		nextPage.addActionListener(new ActionListener() {
 
 			@Override
@@ -208,7 +217,7 @@ public class FinanzhelferCreator extends JFrame {
 				nextPage();
 			}
 		});
-		
+
 		nextPage.setContentAreaFilled(false);
 		nextPage.setOpaque(true);
 		nextPage.setBackground(theme.getButtonColor());
@@ -223,33 +232,40 @@ public class FinanzhelferCreator extends JFrame {
 	}
 
 	private void nextPage() {
-
-		String message = null;
+		String message;
+		Double moneyValue;
+		
+		message = null;
+		moneyValue = Double.parseDouble(money.getText().replace(".", "").replace(',', '.').replace('€', ' '));
 
 		// Checking if any JTextField is empty
-		if (name.getText().equals("") && money.getText().equals("") && kategrien.getText().equals(""))
-			message = "In keinem der Felder ist kein Wert eingetragen. \nAlle Felder benötigen einen Wert!";
+		if (name.getText().equals("") && money.getText().equals("") && kategorien.getText().equals(""))
+			message = dataHandler.getText("windows.creating.dialogues.allEmpty");
 		else if (name.getText().equals("") && money.getText().equals(""))
-			message = "In den Feldern \"Name\" & \"Gehalt\" ist kein Wert eingetragen. \nDiese Felder benötigen einen Wert!";
-		else if (money.getText().equals("") && kategrien.getText().equals(""))
-			message = "In den Feldern \"Gehalt\" & \"Anzahl der Sparten\" ist kein Wert eingetragen. \nDiese Felder benötigen einen Wert!";
-		else if (name.getText().equals("") && kategrien.getText().equals(""))
-			message = "In den Feldern \"Name\" & \"Anzahl der Sparten\" ist kein Wert eingetragen. \nDiese Felder benötigen einen Wert!";
+			message = dataHandler.getText("windows.creating.dialogues.nameAndMoneyEmpty");
+		else if (money.getText().equals("") && kategorien.getText().equals(""))
+			message = dataHandler.getText("windows.creating.dialogues.moneyAndCategoriesEmpty");
+		else if (name.getText().equals("") && kategorien.getText().equals(""))
+			message = dataHandler.getText("windows.creating.dialogues.nameAndCategoriesEmpty");
 		else if (name.getText().equals(""))
-			message = "In dem Feld \"Name\" ist kein Wert eingetragen. \nDieses Feld benötigt einen Wert!";
+			message = dataHandler.getText("windows.creating.dialogues.nameEmpty");
 		else if (money.getText().equals(""))
-			message = "In dem Feld \"Gehalt\" ist kein Wert eingetragen. \nDieses Feld benötigt einen Wert!";
-		else if (kategrien.getText().equals(""))
-			message = "In dem Feld \"Anzahl der Sparten\" ist kein Wert eingetragen. \nDieses Feld benötigt einen Wert ( > 0)!";
+			message = dataHandler.getText("windows.creating.dialogues.moneyEmpty");
+		else if (kategorien.getText().equals(""))
+			message = dataHandler.getText("windows.creating.dialogues.categoriesEmpty");
 		// Checking if JTextField for Sparten contains an unnatural number
-		else if (Double.parseDouble(kategrien.getText().replace(',', '.')) % 1 != 0d)
-			message = "Das Feld \"Anzahl der Sparten\" muss eine natürliche Zahl beinhalten!";
-		else if (Double.parseDouble(kategrien.getText()) <= 0d)
-			message = "In dem Feld \"Anzahl der Sparten\" muss ein Wert > 0 eingetragen werden!";
+		else if (Double.parseDouble(kategorien.getText().replace(',', '.')) % 1 != 0d)
+			message = dataHandler.getText("windows.creating.dialogues.notNatural");
+		else if (Double.parseDouble(kategorien.getText()) <= 0d)
+			message = dataHandler.getText("windows.creating.dialogues.notPositive");
+		else if (moneyValue < 0d)
+			message = dataHandler.getText("windows.creating.dialogues.moneyNegative");
+		// kommt zwar Fehlermeldung in der Konsole, aber egal
 
 		// wenn eine Nachricht vorliegt
 		if (message != null) {
-			JOptionPane.showMessageDialog(this, message, "Fehler!", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(this, message, dataHandler.getText("windows.creating.dialogues.error"),
+					JOptionPane.WARNING_MESSAGE);
 
 			// CategoriesConfigurator von vorne aber mit allen Werten bereits eingetragen
 			getContentPane().removeAll();
@@ -262,21 +278,24 @@ public class FinanzhelferCreator extends JFrame {
 				name.requestFocusInWindow();
 			else if (money.getText().equals(""))
 				money.requestFocusInWindow();
-			else if (kategrien.getText().equals(""))
-				kategrien.requestFocusInWindow();
+			else if (moneyValue < 0d)
+				money.requestFocusInWindow();
+			else if (kategorien.getText().equals(""))
+				kategorien.requestFocusInWindow();
 			// Checking if JTextField for Sparten contains an unnatural number
-			else if (Double.parseDouble(kategrien.getText().replace(',', '.')) % 1 != 0d)
-				kategrien.requestFocusInWindow();
-			else if (Double.parseDouble(kategrien.getText()) <= 0d)
-				kategrien.requestFocusInWindow();
-			// TODO: Button funktioniert nicht mehr
+			else if (Double.parseDouble(kategorien.getText().replace(',', '.')) % 1 != 0d)
+				kategorien.requestFocusInWindow();
+			else if (Double.parseDouble(kategorien.getText().replace(',', '.')) <= 0d)
+				kategorien.requestFocusInWindow();
+			
+			revalidate();
 			return;
 		}
 
 		fhm.creating.setName(name.getText());
-		fhm.creating.setMoney(Double.parseDouble(money.getText().replace(".", "").replace(',', '.').replace('€', ' ')));
+		fhm.creating.setMoney(moneyValue);
 		fhm.creating.setMoneyLeft(fhm.creating.getMoney());
-		fhm.creating.setCategories(new Kategorie[Integer.parseInt(kategrien.getText())]);
+		fhm.creating.setCategories(new Kategorie[Integer.parseInt(kategorien.getText())]);
 
 		dispose();
 

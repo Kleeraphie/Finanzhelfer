@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import de.kleeraphie.finanzhelfer.config.DataHandler;
 import de.kleeraphie.finanzhelfer.finanzhelfer.Finanzhelfer;
 import de.kleeraphie.finanzhelfer.main.Main;
 
@@ -43,15 +44,22 @@ public class ChangeFinanzhelfer extends JFrame {
 	private JPanel left, middle, right;
 	private JPanel southPanel; // für die Btns von buildButtons()
 	private Finanzhelfer selected; // TODO: vllt. irgendwie ohne
+	private DataHandler dataHandler;
+	private Locale loc;
 
 	public ChangeFinanzhelfer() {
 
 		// TODO: BUG: wenn man t (2.) zum standard macht wird erstes zum standard
 		// (irgendwo noch mit Namen verglichen?)
 
+		// TODO: BUG: wenn man auf das Info-Feld klickt, dann wird das nicht als Klick
+		// auf den Btn registriert
+
 		currentPage = 1;
 		c = new GridBagConstraints();
 		theme = Main.theme;
+		dataHandler = Main.dataHandler;
+		loc = Locale.forLanguageTag(dataHandler.getText("language.locale"));
 
 		buildWindow();
 		buildCells();
@@ -62,7 +70,7 @@ public class ChangeFinanzhelfer extends JFrame {
 	}
 
 	private void buildWindow() {
-		setTitle("Finanzhelfer wechseln");
+		setTitle(dataHandler.getText("windows.change.title"));
 		setSize(900, 650);
 		setLocationRelativeTo(Main.window);
 		requestFocus();
@@ -87,7 +95,7 @@ public class ChangeFinanzhelfer extends JFrame {
 
 		fett = new Font(new JLabel().getFont().getFontName(), Font.BOLD, new JLabel().getFont().getSize());
 
-		symbols = new DecimalFormatSymbols(Locale.GERMANY);
+		symbols = new DecimalFormatSymbols(loc);
 
 		// TODO: wenn z.B. 5,6€, dann 5,60€ ausgeben
 		moneyFormat = new DecimalFormat("#,##0.##", symbols);
@@ -162,13 +170,15 @@ public class ChangeFinanzhelfer extends JFrame {
 				currentMoneyLabel.setFont(fett);
 				currentInfoLabel.setFont(fett);
 
-				currentMoneyLabel.setText("Geld:");
-				currentInfoLabel.setText("Info:");
+				currentMoneyLabel.setText(dataHandler.getText("windows.change.labels.money"));
+				currentInfoLabel.setText(dataHandler.getText("windows.change.labels.info"));
 
 				currentName.setText(currentFH.getName());
 				// TODO: Währungssymbol in Config änderbar
-				currentMoney.setText(String.valueOf(moneyFormat.format(currentFH.getMoneyLeft())) + " € / "
-						+ currentFH.getMoney() + " €");
+				currentMoney.setText(String.valueOf(moneyFormat.format(currentFH.getMoneyLeft())) + " "
+						+ dataHandler.getText("currency.symbol1") + " / " + currentFH.getMoney() + " "
+						+ dataHandler.getText("currency.symbol1")); // TODO: vllt. zu currency.getSymbol ändern wie
+																	// sonst überall
 				currentInfo.setText(currentFH.getInfo());
 
 				c.gridwidth = 2;
@@ -219,7 +229,7 @@ public class ChangeFinanzhelfer extends JFrame {
 					public void actionPerformed(ActionEvent e) {
 						selected = getFinanzhelferFromButton(getSelectedBtn());
 						reloadSouthernButtons();
-						System.out.println(selected.getUUID());
+//						System.out.println(selected.getUUID());
 					}
 				});
 
@@ -260,7 +270,9 @@ public class ChangeFinanzhelfer extends JFrame {
 		btnPanel = new JPanel(new FlowLayout());
 		btnPanel.setBackground(theme.getBackgroundColor());
 
-		setCurrent = new JButton("Zu \"" + selected.getName() + "\" wechseln"); // TODO: Namen überarbeiten
+		setCurrent = new JButton(
+				String.format(dataHandler.getText("windows.change.buttons.current"), selected.getName()));
+		// TODO: Namen überarbeiten
 
 		setCurrent.setContentAreaFilled(false);
 		setCurrent.setOpaque(true);
@@ -274,9 +286,12 @@ public class ChangeFinanzhelfer extends JFrame {
 			}
 		});
 
+		if (selected.getUUID() == (Main.fhm.getCurrent().getUUID()))
+			setCurrent.setEnabled(false);
+
 		btnPanel.add(setCurrent);
 
-		setStandard = new JButton("Als Standard setzen");
+		setStandard = new JButton(dataHandler.getText("windows.change.buttons.standard"));
 
 		setStandard.setContentAreaFilled(false);
 		setStandard.setOpaque(true);
@@ -296,7 +311,7 @@ public class ChangeFinanzhelfer extends JFrame {
 
 		btnPanel.add(setStandard);
 
-		pageBefore = new JButton("Seite zurück");
+		pageBefore = new JButton(dataHandler.getText("windows.change.buttons.pageBefore"));
 
 		pageBefore.setContentAreaFilled(false);
 		pageBefore.setOpaque(true);
@@ -314,7 +329,7 @@ public class ChangeFinanzhelfer extends JFrame {
 
 		btnPanel.add(pageBefore);
 
-		nextPage = new JButton("Nächste Seite");
+		nextPage = new JButton(dataHandler.getText("windows.change.buttons.nextPage"));
 
 		nextPage.setContentAreaFilled(false);
 		nextPage.setOpaque(true);
@@ -332,7 +347,7 @@ public class ChangeFinanzhelfer extends JFrame {
 
 		btnPanel.add(nextPage);
 
-		finish = new JButton("OK");
+		finish = new JButton(dataHandler.getText("windows.change.buttons.finish"));
 
 		finish.setContentAreaFilled(false);
 		finish.setOpaque(true);

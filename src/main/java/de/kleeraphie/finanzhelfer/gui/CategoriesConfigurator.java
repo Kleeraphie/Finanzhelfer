@@ -26,6 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
+import de.kleeraphie.finanzhelfer.config.DataHandler;
 import de.kleeraphie.finanzhelfer.finanzhelfer.Kategorie;
 import de.kleeraphie.finanzhelfer.main.Main;
 
@@ -41,6 +42,8 @@ public class CategoriesConfigurator extends JFrame {
 	// ArrayLists speichern die eingegebene Wert für jede Kategorie
 	private GridBagConstraints c;
 	private Theme theme;
+	private DataHandler dataHandler;
+	private Locale loc;
 
 	// TODO: Fertigstellen-Btn auf gleiche Höhe wie Weiter-Btn auf Seite davor (?)
 	// TODO: build-Fkt: Text & Size nicht nach if sondern vorher(s. buildTextFields)
@@ -50,6 +53,8 @@ public class CategoriesConfigurator extends JFrame {
 		currentPage = 1;
 		c = new GridBagConstraints();
 		theme = Main.theme;
+		dataHandler = Main.dataHandler;
+		loc = Locale.forLanguageTag(dataHandler.getText("language.locale"));
 
 		buildWindow();
 		buildCells();
@@ -59,7 +64,7 @@ public class CategoriesConfigurator extends JFrame {
 
 	private void buildWindow() {
 
-		setTitle("Kategorien konfigurieren");
+		setTitle(dataHandler.getText("windows.config.title"));
 		setSize(900, 650);
 		setLocationRelativeTo(Main.window);
 		requestFocus();
@@ -86,10 +91,10 @@ public class CategoriesConfigurator extends JFrame {
 		JFormattedTextField currentMoney;
 
 		// für currentMoney
-		DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMANY);
+		DecimalFormatSymbols symbols = new DecimalFormatSymbols(loc);
 
 		// TODO: In Einstellungen Währung änderbar
-		Currency currency = Currency.getInstance(Locale.GERMANY);
+		Currency currency = Currency.getInstance(loc);
 		String symbol = currency.getSymbol(); // Währungssymbol
 
 		// TODO: rausfinden, wozu die einzelenen Formatter da sind
@@ -123,9 +128,10 @@ public class CategoriesConfigurator extends JFrame {
 				cell.setLayout(new GridBagLayout());
 				cell.setBackground(theme.getBackgroundColor());
 
-				currentNumberLabel = new JLabel("Kategorie #" + (8 * (currentPage - 1) + (i + 1)));
-				currentNameLabel = new JLabel("Name:");
-				currentMoneyLabel = new JLabel("Geld:");
+				currentNumberLabel = new JLabel(String.format(dataHandler.getText("windows.config.labels.categorie"),
+						(8 * (currentPage - 1) + (i + 1))));
+				currentNameLabel = new JLabel(dataHandler.getText("windows.config.labels.name"));
+				currentMoneyLabel = new JLabel(dataHandler.getText("windows.config.labels.money"));
 
 				c.anchor = GridBagConstraints.CENTER;
 				c.gridwidth = 2;
@@ -164,10 +170,10 @@ public class CategoriesConfigurator extends JFrame {
 				currentMoney = new JFormattedTextField(salaryFactory);
 
 				currentMoney.setColumns(24);
-				
+
 				currentName.setBackground(theme.getFieldColor());
 				currentMoney.setBackground(theme.getFieldColor());
-				
+
 				if (spartenAmount == 0)
 					currentMoney.setValue(Main.fhm.creating.getMoney());
 				currentMoney.setValue(0);
@@ -220,23 +226,23 @@ public class CategoriesConfigurator extends JFrame {
 		if (currentPage == pages) { // funktioniert auch wenn beide 1 sind, also wenn <= 8 Sparten konfiguriert
 									// werden müssen
 
-			finish = new JButton("Fertigstellen");
+			finish = new JButton(dataHandler.getText("windows.config.buttons.finish"));
 			finish.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					finish();
 				}
 			});
-			
+
 			finish.setContentAreaFilled(false);
 			finish.setOpaque(true);
 			finish.setBackground(theme.getButtonColor());
-			
+
 			btnPanel.add(finish, c);
 
 		} else {
 
-			nextPage = new JButton("Weiter");
+			nextPage = new JButton(dataHandler.getText("windows.config.buttons.nextPage"));
 			nextPage.setSize(100, 20);
 			nextPage.setLocation(400, 580);
 			nextPage.addActionListener(new ActionListener() {
@@ -245,11 +251,11 @@ public class CategoriesConfigurator extends JFrame {
 					nextPage();
 				}
 			});
-			
+
 			nextPage.setContentAreaFilled(false);
 			nextPage.setOpaque(true);
 			nextPage.setBackground(theme.getButtonColor());
-			
+
 			btnPanel.add(nextPage, c);
 		}
 
@@ -277,13 +283,16 @@ public class CategoriesConfigurator extends JFrame {
 			String message;
 
 			if (c < all)
-				message = "Sie nutzen nicht ihr gesamtes Gehalt! (" + moneyFormat.format(c) + " € < "
-						+ moneyFormat.format(all) + " €)";
+				message = String.format(dataHandler.getText("windows.config.dialogues.notAllMoney"),
+						moneyFormat.format(c), dataHandler.getText("currency.symbol1"), moneyFormat.format(all),
+						dataHandler.getText("currency.symbol1")); // TODO: auch auf currency.getSymbol umschreiben
 			else // c > all
-				message = "Sie nutzen mehr als ihr Gehalt! (" + moneyFormat.format(c) + " € > " + moneyFormat.format(c)
-						+ " €)";
+				message = String.format(dataHandler.getText("windows.config.dialogues.toMuchMoney"),
+						moneyFormat.format(c), dataHandler.getText("currency.symbol1"), moneyFormat.format(all),
+						dataHandler.getText("currency.symbol1")); // TODO: auch auf currency.getSymbol umschreiben
 
-			JOptionPane.showMessageDialog(this, message, "Fehler!", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(this, message, dataHandler.getText("windows.config.dialogues.error"),
+					JOptionPane.WARNING_MESSAGE);
 
 			// CategoriesConfigurator von vorne aber mit allen Werten bereits eingetragen
 			currentPage = 0;
@@ -295,7 +304,8 @@ public class CategoriesConfigurator extends JFrame {
 
 		for (int i = 0; i < spartenAmount; i++) {
 			name = spartenName.get(i).getText();
-			money = Double.parseDouble(spartenMoney.get(i).getText().replace(".", "").replace(',', '.').replace('€', ' '));
+			money = Double
+					.parseDouble(spartenMoney.get(i).getText().replace(".", "").replace(',', '.').replace('€', ' '));
 
 			current = new Kategorie();
 			current.setName(name);
@@ -318,9 +328,8 @@ public class CategoriesConfigurator extends JFrame {
 
 		buildCells();
 		buildButtons();
-		
+
 		revalidate();
-		repaint();
 	}
 
 }

@@ -29,6 +29,7 @@ import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
+import de.kleeraphie.finanzhelfer.config.DataHandler;
 import de.kleeraphie.finanzhelfer.finanzhelfer.Kategorie;
 import de.kleeraphie.finanzhelfer.finanzhelfer.Zahlung;
 import de.kleeraphie.finanzhelfer.main.Main;
@@ -45,10 +46,14 @@ public class AusgabenAdder extends JFrame {
 	private JLabel howOften;
 	private GridBagConstraints c;
 	private Theme theme;
+	private DataHandler dataHandler;
+	private Locale loc;
 
 	public AusgabenAdder() {
 		c = new GridBagConstraints();
 		theme = Main.theme;
+		dataHandler = Main.dataHandler;
+		loc = Locale.forLanguageTag(dataHandler.getText("language.locale"));
 
 		buildWindow();
 		buildLabels();
@@ -59,8 +64,8 @@ public class AusgabenAdder extends JFrame {
 	}
 
 	private void buildWindow() {
-		setTitle("Neue Zahlung hinzufügen");
-		setSize(900, 650);
+		setTitle(dataHandler.getText("windows.add.title"));
+		setSize(900, 650); // TODO: restliche Größen aller Fenster entfernen
 		setLocationRelativeTo(null);
 		requestFocus();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -74,7 +79,7 @@ public class AusgabenAdder extends JFrame {
 	}
 
 	private void buildLabels() {
-		JLabel categorie, name, info, cost, times, paymentType;
+		JLabel categorie, name, info, cost, times, transactionType;
 
 		c.anchor = GridBagConstraints.CENTER;
 		c.weightx = 1;
@@ -82,27 +87,27 @@ public class AusgabenAdder extends JFrame {
 		c.gridx = 0;
 		c.gridy = 0;
 
-		categorie = new JLabel("Kategorie:");
+		categorie = new JLabel(dataHandler.getText("windows.add.labels.categorie"));
 		add(categorie, c);
 
 		c.gridy++;
-		paymentType = new JLabel("Zahlungstyp:");
-		add(paymentType, c);
+		transactionType = new JLabel(dataHandler.getText("windows.add.labels.transactionType"));
+		add(transactionType, c);
 		
 		c.gridy++;
-		name = new JLabel("Name:");
+		name = new JLabel(dataHandler.getText("windows.add.labels.name"));
 		add(name, c);
 
 		c.gridy++;
-		info = new JLabel("Informationen:");
+		info = new JLabel(dataHandler.getText("windows.add.labels.info"));
 		add(info, c);
 
 		c.gridy++;
-		cost = new JLabel("Kosten:");
+		cost = new JLabel(dataHandler.getText("windows.add.labels.cost"));
 		add(cost, c);
 
 		c.gridy++;
-		times = new JLabel("Typ:");
+		times = new JLabel(dataHandler.getText("windows.add.labels.type"));
 		add(times, c);
 
 	}
@@ -113,9 +118,9 @@ public class AusgabenAdder extends JFrame {
 		c.gridy = 0;
 
 		// TODO: In Einstellungen Währung änderbar
-		Currency currency = Currency.getInstance(Locale.GERMANY);
+		Currency currency = Currency.getInstance(loc);
 		String symbol = currency.getSymbol(); // Währungssymbol
-		DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMANY);
+		DecimalFormatSymbols symbols = new DecimalFormatSymbols(loc);
 
 		// TODO: rausfinden, wozu die einzelenen Formatter da sind
 		// create the formatters, default, display, edit
@@ -145,14 +150,13 @@ public class AusgabenAdder extends JFrame {
 		});
 
 		add(categories, c);
-		categories.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 		
 		c.gridy++;
 		types = new JComboBox<String>();
 		types.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 		
-		types.addItem("Ausgabe");
-		types.addItem("Einnahme");
+		types.addItem(dataHandler.getText("windows.add.types.expenditure"));
+		types.addItem(dataHandler.getText("windows.add.types.earning"));
 		
 		types.setUI(new BasicComboBoxUI() {
 			protected JButton createArrowButton() { // TODO: eigene Farbe für den Pfeil erstellen
@@ -190,8 +194,8 @@ public class AusgabenAdder extends JFrame {
 		timesTypes = new JComboBox<>();
 		timesTypes.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"); // 30x x (aber 2px zu klein)
 
-		timesTypes.addItem("Einmalige Zahlung");
-		timesTypes.addItem("Dauerauftrag");
+		timesTypes.addItem(dataHandler.getText("windows.add.types.once"));
+		timesTypes.addItem(dataHandler.getText("windows.add.types.order"));
 
 		timesTypes.setUI(new BasicComboBoxUI() {
 			protected JButton createArrowButton() { // TODO: eigene Farbe für den Pfeil erstellen
@@ -202,7 +206,7 @@ public class AusgabenAdder extends JFrame {
 		timesTypes.addActionListener(new ActionListener() { // TODO: Funktioniert noch nicht
 			public void actionPerformed(ActionEvent e) {
 
-				if (timesTypes.getSelectedItem().toString().equals("Dauerauftrag")) {
+				if (timesTypes.getSelectedItem().toString().equals(dataHandler.getText("windows.add.types.order"))) {
 					JLabel all;
 					JFormattedTextField times;
 
@@ -216,11 +220,11 @@ public class AusgabenAdder extends JFrame {
 					howOftenEntries = new JPanel(new FlowLayout(FlowLayout.LEFT));
 					howOftenEntries.setBackground(theme.getBackgroundColor());
 
-					howOften = new JLabel("Wie oft");
+					howOften = new JLabel(dataHandler.getText("windows.add.labels.howOften"));
 					add(howOften, c);
 
 					c.gridx++; // da nun ein Entry kommt
-					all = new JLabel("Alle");
+					all = new JLabel(dataHandler.getText("windows.add.labels.all"));
 					howOftenEntries.add(all);
 
 					NumberFormat format = NumberFormat.getInstance();
@@ -238,10 +242,10 @@ public class AusgabenAdder extends JFrame {
 
 					unit = new JComboBox<>();
 
-					unit.addItem("Tage");
-					unit.addItem("Wochen");
-					unit.addItem("Monate");
-					unit.addItem("Jahre");
+					unit.addItem(dataHandler.getText("windows.add.units.days"));
+					unit.addItem(dataHandler.getText("windows.add.units.weeks"));
+					unit.addItem(dataHandler.getText("windows.add.units.months"));
+					unit.addItem(dataHandler.getText("windows.add.units.years"));
 
 					howOftenEntries.add(unit);
 
@@ -274,7 +278,7 @@ public class AusgabenAdder extends JFrame {
 		c.gridx = 0;
 		c.gridy++;
 
-		finish = new JButton("Fertigstellen");
+		finish = new JButton(dataHandler.getText("windows.add.buttons.finish"));
 
 		finish.setContentAreaFilled(false);
 		finish.setOpaque(true);
@@ -302,10 +306,9 @@ public class AusgabenAdder extends JFrame {
 		Zahlung payment = new Zahlung(name.getText(), info.getText(), money);
 		
 		if (money > currentCategorie.getMoneyLeft()) {
-			String message = "Diese Payment übersteigt das verbleibende Geld dieser Kategorie! (" + money + " € > "
-					+ currentCategorie.getMoneyLeft() + " €)";
+			String message = String.format(dataHandler.getText("windows.add.dialogues.toExpensive"), money, dataHandler.getText("currency.symbol1"), currentCategorie.getMoneyLeft(), dataHandler.getText("currency.symbol1"));
 
-			JOptionPane.showMessageDialog(this, message, "Fehler!", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(this, message, dataHandler.getText("windows.add.dialogues.error"), JOptionPane.WARNING_MESSAGE);
 
 			return;
 		}
@@ -313,7 +316,7 @@ public class AusgabenAdder extends JFrame {
 		String selected = String.valueOf(categories.getSelectedItem());
 		Kategorie current = Main.fhm.getCurrent().getCategorieByName(selected);
 
-		if (timesTypes.getSelectedItem().toString().equals("Dauerauftrag")) {
+		if (timesTypes.getSelectedItem().toString().equals(dataHandler.getText("windows.add.types.order"))) {
 			int delay = ((int) ((JFormattedTextField) howOftenEntries.getComponent(1)).getValue());
 
 			switch (unit.getSelectedItem().toString()) {

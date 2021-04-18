@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import de.kleeraphie.finanzhelfer.config.DataHandler;
 //import ChartDirector.ChartViewer;
 //import de.kleeraphie.finanzhelfer.charts.donut;
 import de.kleeraphie.finanzhelfer.main.Main;
@@ -27,12 +28,14 @@ public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1211837376461487581L;
 	private Theme theme;
 	private GridBagConstraints c;
+	private DataHandler dataHandler;
 
 	public MainWindow() {
 		
 		// TODO: alle Fenster gleich groß
 
 		theme = Main.theme;
+		dataHandler = Main.dataHandler;
 		
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -50,7 +53,7 @@ public class MainWindow extends JFrame {
 
 	private void buildWindow() {
 
-		setTitle("Finanzhelfer");
+		setTitle(dataHandler.getText("windows.main.title"));
 		setExtendedState(MAXIMIZED_BOTH);
 		setLocationRelativeTo(null);
 		requestFocus();
@@ -71,7 +74,7 @@ public class MainWindow extends JFrame {
 
 	private void buildTaskBar() {
 		JPanel taskBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		JButton createFH, switchFH, settings, newExpenditure, listExpenditures;
+		JButton createFH, switchFH, settings, newTransaction, listTransactions;
 
 		// TODO: vllt. andere Aufteilung der Btns wenn kein FH vorhanden
 		// TODO: taskBar height wieder so wie früher
@@ -83,7 +86,7 @@ public class MainWindow extends JFrame {
 
 		createFH = new JButton("+");
 		createFH.setPreferredSize(new Dimension(50, 50));
-		createFH.setToolTipText("Neuen Finanzhelfer erstellen");
+		createFH.setToolTipText(dataHandler.getText("windows.main.buttons.createFH"));
 		createFH.addActionListener(new ActionListener() {
 
 			@Override
@@ -101,7 +104,7 @@ public class MainWindow extends JFrame {
 		if (Main.fhm.fhList.size() >= 2) {
 			switchFH = new JButton("W");
 			switchFH.setPreferredSize(new Dimension(50, 50));
-			switchFH.setToolTipText("Finanzhelfer wechseln");
+			switchFH.setToolTipText(dataHandler.getText("windows.main.buttons.switchFH"));
 			switchFH.addActionListener(new ActionListener() {
 				
 				@Override
@@ -118,7 +121,7 @@ public class MainWindow extends JFrame {
 		settings = new JButton();
 		settings.setPreferredSize(new Dimension(50, 50));
 
-		settings.setToolTipText("Einstellungen");
+		settings.setToolTipText(dataHandler.getText("windows.main.buttons.settings"));
 		settings.addActionListener(new ActionListener() {
 			
 			@Override
@@ -145,16 +148,16 @@ public class MainWindow extends JFrame {
 
 		if (Main.fhm.getStandard() != null) {
 
-			newExpenditure = new JButton("N");
-			newExpenditure.setPreferredSize(new Dimension(50, 50));
+			newTransaction = new JButton("N");
+			newTransaction.setPreferredSize(new Dimension(50, 50));
 
 			if (Main.fhm.fhList.size() >= 2)
-				newExpenditure.setLocation(250, 25);
+				newTransaction.setLocation(250, 25);
 			else
-				newExpenditure.setLocation(175, 25);
+				newTransaction.setLocation(175, 25);
 
-			newExpenditure.setToolTipText("Neue Payment hinzufügen");
-			newExpenditure.addActionListener(new ActionListener() {
+			newTransaction.setToolTipText(dataHandler.getText("windows.main.buttons.newTransaction"));
+			newTransaction.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -162,21 +165,21 @@ public class MainWindow extends JFrame {
 				}
 			});
 
-			newExpenditure.setContentAreaFilled(false);
-			newExpenditure.setOpaque(true);
-			newExpenditure.setBackground(theme.getButtonColor());
-			taskBar.add(newExpenditure);
+			newTransaction.setContentAreaFilled(false);
+			newTransaction.setOpaque(true);
+			newTransaction.setBackground(theme.getButtonColor());
+			taskBar.add(newTransaction);
 
-			listExpenditures = new JButton("L");
-			listExpenditures.setPreferredSize(new Dimension(50, 50));
+			listTransactions = new JButton("L");
+			listTransactions.setPreferredSize(new Dimension(50, 50));
 
 			if (Main.fhm.fhList.size() >= 2)
-				listExpenditures.setLocation(325, 25);
+				listTransactions.setLocation(325, 25);
 			else
-				listExpenditures.setLocation(250, 25);
+				listTransactions.setLocation(250, 25);
 
-			listExpenditures.setToolTipText("Alle Ausgaben auflisten");
-			listExpenditures.addActionListener(new ActionListener() {
+			listTransactions.setToolTipText(dataHandler.getText("windows.main.buttons.listTransactions"));
+			listTransactions.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -184,10 +187,10 @@ public class MainWindow extends JFrame {
 				}
 			});
 
-			listExpenditures.setContentAreaFilled(false);
-			listExpenditures.setOpaque(true);
-			listExpenditures.setBackground(theme.getButtonColor());
-			taskBar.add(listExpenditures);
+			listTransactions.setContentAreaFilled(false);
+			listTransactions.setOpaque(true);
+			listTransactions.setBackground(theme.getButtonColor());
+			taskBar.add(listTransactions);
 
 		}
 

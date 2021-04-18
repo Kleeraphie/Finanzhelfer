@@ -1,0 +1,118 @@
+language:
+    name: Deutsch (Deutschland)
+    locale: de-DE
+
+currency:
+    symbol1: €
+    symbol2: ct
+    
+    name1: Euro
+    name2: Cent
+
+windows:
+    main:
+        title: Finanzhelfer
+        buttons:
+            createFH: Neuen Finanzhelfer erstellen
+            switchFH: Finanzhelfer wechseln
+            settings: Einstellungen
+            newTransaction: Neue Transaktion hinzufügen
+            listTransactions: Alle Transaktionen auflisten
+    settings:
+        title: Einstellungen
+        buttons:
+            save: Speichern
+            discard: Abbrechen
+        categories:
+            general: Allgemein
+            save: Speicheroptionen
+    creating:
+        title: Neuen Finanzhelfer erstellen
+        buttons:
+            nextPage: Weiter
+        labels:
+            name: Name:
+            money: Gehalt:
+            categories: Anzahl an Kategorien:
+        dialogues:
+            error: Fehler!
+            
+            notFinishedExists: Ein neuer Finanzhelfer wurde nicht fertig erstellt. \nWollen Sie diesen weiter bearbeiten?
+            
+            allEmpty: In keinem der Felder ist ein Wert eingetragen. \nAlle Felder benötigen einen Wert!
+            nameAndMoneyEmpty: In den Feldern "Name" & "Gehalt" ist kein Wert eingetragen. \nDiese Felder benötigen einen Wert!
+            moneyAndCategoriesEmpty: In den Feldern "Gehalt" & "Anzahl an Kategorien" ist kein Wert eingetragen. \nDiese Felder benötigen einen Wert!
+            nameAndCategoriesEmpty: In den Feldern "Name" & "Anzahl an Kategorien" ist kein Wert eingetragen. \nDiese Felder benötigen einen Wert!
+            nameEmpty: In dem Feld "Name" ist kein Wert eingetragen. \nDieses Feld benötigt einen Wert!
+            moneyEmpty: In dem Feld "Gehalt" ist kein Wert eingetragen. \nDieses Feld benötigt einen Wert!
+            categoriesEmpty: In dem Feld "Anzahl an Kategorien" ist kein Wert eingetragen. \nDieses Feld benötigt einen Wert ( > 0)!
+            notNatural: Das Feld "Anzahl an Kategorien" muss eine natürliche Zahl beinhalten!
+            notPositive: In dem Feld "Anzahl an Kategorien" muss ein Wert > 0 eingetragen werden!
+            moneyNegative: In dem Feld "Gehalt" muss ein Wert >= 0 eingetragen werden!
+    change:
+        title: Finanzhelfer wechseln
+        buttons:
+            current: Zu %s wechseln
+            standard: Als Standard setzen
+            pageBefore: Seite zurück
+            nextPage: Nächste Seite
+            finish: OK
+        labels:
+            money: Geld:
+            info: Info:
+    config:
+        title: Kategorien konfigurieren
+        buttons:
+            finish: Fertigstellen
+            nextPage: Weiter
+        labels:
+            expenditure: Ausgaben für:
+            categorie: Kategorie #%d
+            name: Name:
+            money: Geld:
+        dialogues:
+            notAllMoney: Sie nutzen nicht ihr gesamtes Gehalt! (%s %s < %s %s)
+            toMuchMoney: Sie nutzen mehr als ihr Gehalt! (%s %s > %s %s)
+            error: Fehler!
+    list:
+        title: Liste der Transaktionen
+        buttons:
+            pageBefore: Seite zurück
+            nextPage: Nächste Seite
+            finish: OK
+        labels:
+            money: Betrag:
+            info: Info:
+            date: Datum:
+    add:
+        title: Neue Transaktion hinzufügen
+        buttons:
+            finish: Fertigstellen
+        labels:
+            categorie: Kategorie:
+            transactionType: Zahlungstyp:
+            name: Name:
+            info: Informationen:
+            cost: Kosten:
+            times: Typ:
+            howOften: Wie oft:
+            all: Alle
+        types:
+            expenditure: Ausgabe
+            earning: Einnahme
+            once: Einmalige Zahlung
+            order: Dauerauftrag
+        units:
+            days: Tage
+            weeks: Wochen
+            months: Monate
+            years: Jahre
+        dialogues:
+            toExpensive: Diese Ausgabe übersteigt das verbleibende Geld dieser Kategorie! (%s %s > %s %s)
+            error: Fehler!
+
+categories:
+    general:
+        labels:
+            language: Sprache
+            currency: Währung
