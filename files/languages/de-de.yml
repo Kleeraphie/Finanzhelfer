@@ -113,7 +113,14 @@ windows:
 
 categories:
     general:
+        buttons:
+            save: Speichern
+            discard: Abbrechen
         labels:
-            language: Sprache
-            currency: Währung
+            language: Sprache:
+            currency: Währung:
+            theme: Theme:
+ themes:
+    light: Helles Theme
+    dark: Dunkles Theme
  
