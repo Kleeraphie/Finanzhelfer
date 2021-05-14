@@ -208,11 +208,16 @@ public class MainWindow extends JFrame {
 
 	public void refresh() {
 
+		Main.dataHandler = new DataHandler();
+		Main.theme = dataHandler.getCurrentTheme();
+		
 		getContentPane().removeAll();
-
+		theme = Main.theme;
+		
 		revalidate();
 		repaint();
-
+		// TODO: Bug: Fenster nicht mehr maximiert
+		buildWindow();
 		buildTaskBar();
 
 	}

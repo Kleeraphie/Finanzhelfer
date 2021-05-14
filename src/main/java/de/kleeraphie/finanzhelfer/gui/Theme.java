@@ -4,12 +4,14 @@ import java.awt.Color;
 
 public enum Theme {
 	// TODO: btnColor bei Dark ändern (sieht so aus wie ein Loch)
-	LIGHT_THEME("#ffffff", "#e3e3e3", "#f0f0f0", "#f0f0f0"),
-	DARK_THEME("#858585", "#6e6e6e", "#858585", "#858585");
+	LIGHT_THEME(0, "#ffffff", "#e3e3e3", "#f0f0f0", "#f0f0f0"),
+	DARK_THEME(1, "#858585", "#6e6e6e", "#858585", "#858585");
 	
 	private String backgroundColor, taskBarColor, buttonColor, fieldColor;
+	private int id;
 	
-	private Theme(String backgroundColor, String taskBarColor, String buttonColor, String fieldColor) {
+	private Theme(int id, String backgroundColor, String taskBarColor, String buttonColor, String fieldColor) {
+		this.id = id;
 		this.backgroundColor = backgroundColor;
 		this.taskBarColor = taskBarColor;
 		this.buttonColor = buttonColor;
@@ -46,6 +48,10 @@ public enum Theme {
 	
 	public Color getFieldColor() {
 		return Color.decode(fieldColor);
+	}
+
+	public int getID() {
+		return id;
 	}
 
 }

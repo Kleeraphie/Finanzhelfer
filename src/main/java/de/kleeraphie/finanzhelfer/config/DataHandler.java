@@ -2,6 +2,7 @@ package de.kleeraphie.finanzhelfer.config;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 import com.google.gson.Gson;
 
 import de.kleeraphie.finanzhelfer.finanzhelfer.FinanzhelferManager;
-import de.kleeraphie.finanzhelfer.main.Main;
+import de.kleeraphie.finanzhelfer.gui.Theme;
 
 public class DataHandler {
 
@@ -22,14 +23,14 @@ public class DataHandler {
 	private HashMap<String, String> currentLangTexts;
 
 	// TODO: Mehrzahl bei Währung beachten
-	
+
 	public DataHandler() {
 		gson = new Gson();
 		data = new File("files/data.json");
 		config = new File("files/config.yml");
 		langDir = new File("files/languages");
 
-		currentLangTexts = loadLanguageFile(getCurrentLanguage());
+		currentLangTexts = loadLanguageFile(get("current_lang"));
 	}
 
 	public void saveInData(FinanzhelferManager toSave) {
@@ -53,7 +54,37 @@ public class DataHandler {
 
 	}
 
-	public void setCurrentLanguage(String newLanguage) {
+	public String get(String path) {
+
+		try {
+
+			BufferedReader bfr = new BufferedReader(new FileReader(config));
+			String line;
+			String[] texts;
+
+			while ((line = bfr.readLine()) != null) {
+
+				if (line.startsWith(path)) {
+
+					texts = line.split(":");
+					bfr.close();
+
+					return texts[1].trim();
+				}
+
+			}
+
+			bfr.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		return null;
+
+	}
+
+	private void set(String path, String toSet) {
 
 		try {
 			BufferedReader bfr = new BufferedReader(new FileReader(config));
@@ -63,14 +94,15 @@ public class DataHandler {
 
 			while ((line = bfr.readLine()) != null) {
 
-				if (line.startsWith("current_lang:")) {
+				if (line.startsWith(path)) {
 
 					texts = line.split(":");
-					line = texts[0] + ": " + newLanguage;
-					inputBuffer.append(line);
-					inputBuffer.append('\n');
+					line = texts[0] + ": " + toSet;
 
 				}
+
+				inputBuffer.append(line);
+				inputBuffer.append('\n');
 
 			}
 
@@ -83,36 +115,6 @@ public class DataHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-	}
-
-	public String getCurrentLanguage() {
-
-		try {
-
-			BufferedReader bfr = new BufferedReader(new FileReader(config));
-			String line;
-			String[] texts;
-
-			while ((line = bfr.readLine()) != null) {
-
-				if (line.startsWith("current_lang:")) {
-
-					texts = line.split(":");
-					bfr.close();
-					return texts[1].trim();
-
-				}
-
-			}
-
-			bfr.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		return null;
 
 	}
 
@@ -147,11 +149,40 @@ public class DataHandler {
 	}
 
 	public void changeLanguage(String lang) {
-		Main.window.refresh();
+		set("current_lang", lang);
+	}
+
+	public void changeSymbols(String symbols) {
+		set("current_symbols", symbols);
+	}
+
+	public void changeTheme(String newTheme) {
+		ArrayList<String> themes = getTextArray("themes");
+		int theme = 0;
+		
+		for (int i = 0; i < themes.size(); i++) {
+			if (themes.get(i).equals(newTheme)) {
+				theme = i;
+				break;
+			}
+		}
+		
+		set("current_theme", String.valueOf(theme));
 	}
 
 	public String getText(String key) { // Text für Sache in richtiger Sprache returnen
 		return currentLangTexts.get(key);
+	}
+
+	public ArrayList<String> getTextArray(String keyBegin) {
+		ArrayList<String> result = new ArrayList<>();
+
+		for (String current : currentLangTexts.keySet()) {
+			if (current.startsWith(keyBegin) && !current.equalsIgnoreCase(keyBegin))
+				result.add(0, getText(current)); // 0, da sonst die Reihenfolge falschrum ist als in der lang-Datei
+		}
+
+		return result;
 	}
 
 	public void loadConfig() {
@@ -264,10 +295,35 @@ public class DataHandler {
 
 //	benutzt um in result den text zu packen um mehrzeilige Nachrichten zu machen -> hat nicht funktioniert
 	private String replace(String string) {
-		
+
 		string = string.replaceAll("\\\\n", System.lineSeparator()); // \\\\n = \\n = \n; wenn nur replace() dann \\n
-		
+
 		return string;
+	}
+
+	public String getLangCodeByLangName(String name) throws FileNotFoundException {
+		HashMap<String, String> current;
+
+		for (File lang : langDir.listFiles()) {
+			current = loadLanguageFile(lang.getName().replace(".yml", ""));
+
+			if (current.get("language.name").equals(name))
+				return lang.getName().replace(".yml", "");
+
+		}
+
+		throw new FileNotFoundException("Corresponding file not found for: " + name);
+
+	}
+
+	public Theme getThemeByID(int theme) {
+
+		for (Theme current : Theme.values()) {
+			if (current.getID() == theme)
+				return current;
+		}
+
+		return null;
 	}
 
 }
