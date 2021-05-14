@@ -72,6 +72,9 @@ public class DataHandler {
 					return texts[1].trim();
 				}
 
+				inputBuffer.append(line);
+				inputBuffer.append('\n');
+
 			}
 
 			bfr.close();
@@ -98,6 +101,36 @@ public class DataHandler {
 
 					texts = line.split(":");
 					line = texts[0] + ": " + toSet;
+				}
+
+			}
+
+			bfr.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		return null;
+
+	}
+
+	// TODO: Texte für Symbols & Theme sprachenunabhängig speichern
+
+	private void setCurrentSymbols(String newSymbols) {
+
+		try {
+			BufferedReader bfr = new BufferedReader(new FileReader(config));
+			StringBuffer inputBuffer = new StringBuffer();
+			String line;
+			String[] texts;
+
+			while ((line = bfr.readLine()) != null) {
+
+				if (line.startsWith("current_symbols:")) {
+
+					texts = line.split(":");
+					line = texts[0] + ": " + newSymbols;
 
 				}
 
@@ -115,6 +148,111 @@ public class DataHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	public String getCurrentSymbols() {
+
+		try {
+
+			BufferedReader bfr = new BufferedReader(new FileReader(config));
+			String line;
+			String[] texts;
+
+			while ((line = bfr.readLine()) != null) {
+
+				if (line.startsWith("current_symbols:")) {
+
+					texts = line.split(":");
+					bfr.close();
+					return texts[1].trim();
+
+				}
+
+			}
+
+			bfr.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void setCurrentTheme(String newTheme) {
+
+		try {
+			BufferedReader bfr = new BufferedReader(new FileReader(config));
+			StringBuffer inputBuffer = new StringBuffer();
+			String line;
+			String[] texts;
+			int theme = 0;
+			ArrayList<String> themes;
+
+			themes = getTextArray("themes");
+
+			for (int i = 0; i < themes.size(); i++) {
+				if (themes.get(i).equals(newTheme)) {
+					theme = i;
+					break;
+				}
+			}
+
+			while ((line = bfr.readLine()) != null) {
+
+				if (line.startsWith("current_theme:")) {
+
+					texts = line.split(":");
+					line = texts[0] + ": " + theme;
+
+				}
+
+				inputBuffer.append(line);
+				inputBuffer.append('\n');
+
+			}
+
+			bfr.close();
+
+			FileOutputStream fileOut = new FileOutputStream("files/config.yml");
+			fileOut.write(inputBuffer.toString().getBytes());
+			fileOut.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public Theme getCurrentTheme() {
+		int theme;
+
+		try {
+
+			BufferedReader bfr = new BufferedReader(new FileReader(config));
+			String line;
+			String[] texts;
+
+			while ((line = bfr.readLine()) != null) {
+
+				if (line.startsWith("current_theme:")) {
+
+					bfr.close();
+
+					texts = line.split(":");
+					theme = Integer.parseInt(texts[1].trim());
+
+					return getThemeByID(theme);
+				}
+
+			}
+
+			bfr.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 
 	}
 
