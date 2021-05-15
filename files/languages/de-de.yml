@@ -120,7 +120,18 @@ categories:
             language: Sprache:
             currency: Währung:
             theme: Theme:
- themes:
+    test:
+        buttons:
+            save: Speichern
+            discard: Abbrechen
+        labels:
+            save_option: Speicheroption
+            save_loc: Speicherort
+        options:
+            local: Lokal
+            online: Online
+
+themes:
     light: Helles Theme
     dark: Dunkles Theme
  

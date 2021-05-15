@@ -30,7 +30,7 @@ public class DataHandler {
 		config = new File("files/config.yml");
 		langDir = new File("files/languages");
 
-		currentLangTexts = loadLanguageFile(get("current_lang"));
+		currentLangTexts = loadLanguageFile(getFromConfig("current_lang"));
 	}
 
 	public void saveInData(FinanzhelferManager toSave) {
@@ -54,7 +54,7 @@ public class DataHandler {
 
 	}
 
-	public String get(String path) {
+	public String getFromConfig(String path) {
 
 		try {
 
@@ -72,9 +72,6 @@ public class DataHandler {
 					return texts[1].trim();
 				}
 
-				inputBuffer.append(line);
-				inputBuffer.append('\n');
-
 			}
 
 			bfr.close();
@@ -87,7 +84,7 @@ public class DataHandler {
 
 	}
 
-	private void set(String path, String toSet) {
+	private void setInConfig(String path, String toSet) {
 
 		try {
 			BufferedReader bfr = new BufferedReader(new FileReader(config));
@@ -101,36 +98,6 @@ public class DataHandler {
 
 					texts = line.split(":");
 					line = texts[0] + ": " + toSet;
-				}
-
-			}
-
-			bfr.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		return null;
-
-	}
-
-	// TODO: Texte für Symbols & Theme sprachenunabhängig speichern
-
-	private void setCurrentSymbols(String newSymbols) {
-
-		try {
-			BufferedReader bfr = new BufferedReader(new FileReader(config));
-			StringBuffer inputBuffer = new StringBuffer();
-			String line;
-			String[] texts;
-
-			while ((line = bfr.readLine()) != null) {
-
-				if (line.startsWith("current_symbols:")) {
-
-					texts = line.split(":");
-					line = texts[0] + ": " + newSymbols;
 
 				}
 
@@ -148,111 +115,6 @@ public class DataHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-	}
-
-	public String getCurrentSymbols() {
-
-		try {
-
-			BufferedReader bfr = new BufferedReader(new FileReader(config));
-			String line;
-			String[] texts;
-
-			while ((line = bfr.readLine()) != null) {
-
-				if (line.startsWith("current_symbols:")) {
-
-					texts = line.split(":");
-					bfr.close();
-					return texts[1].trim();
-
-				}
-
-			}
-
-			bfr.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	private void setCurrentTheme(String newTheme) {
-
-		try {
-			BufferedReader bfr = new BufferedReader(new FileReader(config));
-			StringBuffer inputBuffer = new StringBuffer();
-			String line;
-			String[] texts;
-			int theme = 0;
-			ArrayList<String> themes;
-
-			themes = getTextArray("themes");
-
-			for (int i = 0; i < themes.size(); i++) {
-				if (themes.get(i).equals(newTheme)) {
-					theme = i;
-					break;
-				}
-			}
-
-			while ((line = bfr.readLine()) != null) {
-
-				if (line.startsWith("current_theme:")) {
-
-					texts = line.split(":");
-					line = texts[0] + ": " + theme;
-
-				}
-
-				inputBuffer.append(line);
-				inputBuffer.append('\n');
-
-			}
-
-			bfr.close();
-
-			FileOutputStream fileOut = new FileOutputStream("files/config.yml");
-			fileOut.write(inputBuffer.toString().getBytes());
-			fileOut.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public Theme getCurrentTheme() {
-		int theme;
-
-		try {
-
-			BufferedReader bfr = new BufferedReader(new FileReader(config));
-			String line;
-			String[] texts;
-
-			while ((line = bfr.readLine()) != null) {
-
-				if (line.startsWith("current_theme:")) {
-
-					bfr.close();
-
-					texts = line.split(":");
-					theme = Integer.parseInt(texts[1].trim());
-
-					return getThemeByID(theme);
-				}
-
-			}
-
-			bfr.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 
 	}
 
@@ -287,25 +149,19 @@ public class DataHandler {
 	}
 
 	public void changeLanguage(String lang) {
-		set("current_lang", lang);
+		setInConfig("current_lang", lang);
 	}
 
 	public void changeSymbols(String symbols) {
-		set("current_symbols", symbols);
+		setInConfig("current_symbols", symbols);
 	}
 
-	public void changeTheme(String newTheme) {
-		ArrayList<String> themes = getTextArray("themes");
-		int theme = 0;
-		
-		for (int i = 0; i < themes.size(); i++) {
-			if (themes.get(i).equals(newTheme)) {
-				theme = i;
-				break;
-			}
-		}
-		
-		set("current_theme", String.valueOf(theme));
+	public void changeTheme(int themeID) {
+		setInConfig("current_theme", String.valueOf(themeID));
+	}
+	
+	public void changeSaveOption(int newOption) {
+		setInConfig("save_option", String.valueOf(newOption));
 	}
 
 	public String getText(String key) { // Text für Sache in richtiger Sprache returnen
