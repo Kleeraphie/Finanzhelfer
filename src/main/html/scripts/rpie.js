@@ -1,5 +1,3 @@
-//window.onload = generatePieGraph(60, "normal");
-
 function generatePieGraph(t, e) {
     ! function() {
         var t = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
