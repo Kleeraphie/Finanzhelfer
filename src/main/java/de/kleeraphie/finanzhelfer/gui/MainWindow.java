@@ -1,10 +1,12 @@
 package de.kleeraphie.finanzhelfer.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -17,8 +19,17 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.RingPlot;
+import org.jfree.data.general.DefaultPieDataset;
 
 import de.kleeraphie.finanzhelfer.config.DataHandler;
+import de.kleeraphie.finanzhelfer.finanzhelfer.Kategorie;
+import de.kleeraphie.finanzhelfer.finanzhelfer.Zahlung;
 //import ChartDirector.ChartViewer;
 //import de.kleeraphie.finanzhelfer.charts.donut;
 import de.kleeraphie.finanzhelfer.main.Main;
@@ -31,19 +42,20 @@ public class MainWindow extends JFrame {
 	private DataHandler dataHandler;
 
 	public MainWindow() {
-		
+
 		// TODO: alle Fenster gleich groß
 
 		theme = Main.theme;
 		dataHandler = Main.dataHandler;
-		
+
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.NORTHWEST;
 
 		buildWindow();
-		setVisible(true);
 		buildTaskBar();
+		buildGraphs();
+		setVisible(true);
 
 		// ChartViewer viewer = new ChartViewer();
 		// donut.createChart(viewer, 0);
@@ -67,20 +79,22 @@ public class MainWindow extends JFrame {
 				Main.fhm.save();
 			}
 		});
-		
-		setMinimumSize(new Dimension(800,450));
+
+		setMinimumSize(new Dimension(800, 450));
 
 	}
 
 	private void buildTaskBar() {
 		JPanel taskBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JButton createFH, switchFH, settings, newTransaction, listTransactions;
+		final boolean multFHs = Main.fhm.fhList.size() >= 2;
 
 		// TODO: vllt. andere Aufteilung der Btns wenn kein FH vorhanden
 		// TODO: taskBar height wieder so wie früher
 		// TODO: Symbole für die Buttons erstellen und einfügen
 		// TODO: bei list auch Möglichkeit zum Bearbeiten einbauen
 		// mit eckigen Pfeil davor oder dahinter um Info noch anzuzeigen
+		// TODO: ToolTips durch getTextArray("windows.main.buttons") machen
 
 		taskBar.setBackground(theme.getTaskBarColor());
 
@@ -101,12 +115,12 @@ public class MainWindow extends JFrame {
 
 		taskBar.add(createFH);
 
-		if (Main.fhm.fhList.size() >= 2) {
+		if (multFHs) {
 			switchFH = new JButton("W");
 			switchFH.setPreferredSize(new Dimension(50, 50));
 			switchFH.setToolTipText(dataHandler.getText("windows.main.buttons.switchFH"));
 			switchFH.addActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					new ChangeFinanzhelfer();
@@ -123,7 +137,7 @@ public class MainWindow extends JFrame {
 
 		settings.setToolTipText(dataHandler.getText("windows.main.buttons.settings"));
 		settings.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				new Settings();
@@ -151,7 +165,7 @@ public class MainWindow extends JFrame {
 			newTransaction = new JButton("N");
 			newTransaction.setPreferredSize(new Dimension(50, 50));
 
-			if (Main.fhm.fhList.size() >= 2)
+			if (multFHs)
 				newTransaction.setLocation(250, 25);
 			else
 				newTransaction.setLocation(175, 25);
@@ -173,7 +187,7 @@ public class MainWindow extends JFrame {
 			listTransactions = new JButton("L");
 			listTransactions.setPreferredSize(new Dimension(50, 50));
 
-			if (Main.fhm.fhList.size() >= 2)
+			if (multFHs)
 				listTransactions.setLocation(325, 25);
 			else
 				listTransactions.setLocation(250, 25);
@@ -183,7 +197,7 @@ public class MainWindow extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					new AusgabenList();
+					new TransactionList();
 				}
 			});
 
@@ -196,9 +210,10 @@ public class MainWindow extends JFrame {
 
 		c.gridx = 0;
 		c.gridy = 0;
+		c.gridwidth = 2;
 		c.weightx = 1;
 		c.weighty = 1;
-		
+
 		add(taskBar, c);
 
 		revalidate();
@@ -206,19 +221,135 @@ public class MainWindow extends JFrame {
 
 	}
 
+	private void buildGraphs() {
+		JPanel minorGraphs;
+		ChartPanel result;
+		DefaultPieDataset<String> dataset;
+		JFreeChart chart;
+		RingPlot plot;
+		double used;
+
+		c.gridwidth = 1;
+		c.insets = new Insets(100, 100, 0, 200);
+		
+		// Main graph
+		dataset = new DefaultPieDataset<String>();
+		
+		dataset.setValue("Übrig", Main.fhm.getCurrent().getMoneyLeft());
+		
+		used = 0d;
+		
+		for (Kategorie c : Main.fhm.getCurrent().getCategories()) {
+			for (Zahlung p : c.getPayments()) {
+				used += p.getCost();
+			}
+		}
+		dataset.setValue("Verbraucht", Math.abs(used));
+		
+		chart = ChartFactory.createRingChart(null, dataset, false, true, false);
+		plot = (RingPlot) chart.getPlot();
+
+		plot.setShadowPaint(Color.BLACK);
+		plot.setSimpleLabels(true);
+
+		plot.setLabelBackgroundPaint(theme.getBackgroundColor());
+		plot.setBackgroundPaint(theme.getBackgroundColor());
+		plot.setLabelOutlinePaint(null);
+		plot.setLabelShadowPaint(null);
+
+		plot.setSectionDepth(0.50);
+		plot.setSectionOutlinesVisible(false);
+		plot.setSeparatorsVisible(false);
+
+		plot.setIgnoreZeroValues(true);
+
+		plot.setNoDataMessage("No data available");
+		plot.setSectionDepth(0.08);
+		plot.setCircular(true);
+		plot.setLabelGap(0.50);
+
+		result = new ChartPanel(chart);
+		result.setPreferredSize(new Dimension(1000, 800));
+
+		add(result, c);
+		
+		
+
+		// Minor graphs
+		minorGraphs = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		minorGraphs.setBackground(theme.getBackgroundColor());
+
+		JScrollPane scrollPane = new JScrollPane(minorGraphs);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setBounds(0, 0, 300, 200);
+		scrollPane.setPreferredSize(new Dimension(600, 230));
+
+		c.gridx++;
+
+		for (Kategorie cat : Main.fhm.getCurrent().getCategories()) {
+			used = 0d;
+			
+			dataset = new DefaultPieDataset<String>();
+			dataset.setValue("Übrig", cat.getMoneyLeft());
+
+			for (Zahlung p : cat.getPayments())
+				used += p.getCost();
+			dataset.setValue("Verbraucht", Math.abs(used));
+
+			chart = ChartFactory.createRingChart(null, dataset, false, true, false);
+			plot = (RingPlot) chart.getPlot();
+
+			plot.setShadowPaint(Color.BLACK);
+			plot.setSimpleLabels(true);
+
+			plot.setLabelBackgroundPaint(theme.getBackgroundColor());
+			plot.setBackgroundPaint(theme.getBackgroundColor());
+			plot.setLabelOutlinePaint(null);
+			plot.setLabelShadowPaint(null);
+
+			plot.setSectionDepth(0.50);
+			plot.setSectionOutlinesVisible(false);
+			plot.setSeparatorsVisible(false);
+
+			plot.setIgnoreZeroValues(true);
+
+			plot.setNoDataMessage("No data available");
+			plot.setSectionDepth(0.08);
+			plot.setCircular(true);
+			plot.setLabelGap(0.50);
+
+			result = new ChartPanel(chart);
+			result.setPreferredSize(new Dimension(300, 200));
+
+			minorGraphs.add(result);
+		}
+
+//		testGraph = RingChart.createDemoPanel();
+//		testGraph.setPreferredSize(new Dimension(300, 200));
+//		minorGraphs.add(testGraph);
+
+		add(scrollPane, c);
+
+		repaint();
+		revalidate();
+	}
+
 	public void refresh() {
 
 		Main.dataHandler = new DataHandler();
-		Main.theme = dataHandler.getCurrentTheme();
-		
+		Main.theme = dataHandler.getThemeByID(Integer.parseInt(dataHandler.getFromConfig("current_theme")));
+
 		getContentPane().removeAll();
+		dataHandler = Main.dataHandler;
 		theme = Main.theme;
-		
+
 		revalidate();
 		repaint();
 		// TODO: Bug: Fenster nicht mehr maximiert
 		buildWindow();
 		buildTaskBar();
+		buildGraphs();
 
 	}
 

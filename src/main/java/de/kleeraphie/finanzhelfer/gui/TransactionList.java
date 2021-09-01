@@ -32,7 +32,7 @@ import de.kleeraphie.finanzhelfer.config.DataHandler;
 import de.kleeraphie.finanzhelfer.finanzhelfer.Kategorie;
 import de.kleeraphie.finanzhelfer.main.Main;
 
-public class AusgabenList extends JFrame {
+public class TransactionList extends JFrame {
 
 	private static final long serialVersionUID = 8022505422069339749L;
 
@@ -45,7 +45,7 @@ public class AusgabenList extends JFrame {
 	private DataHandler dataHandler;
 	private Locale loc;
 
-	public AusgabenList() {
+	public TransactionList() {
 
 		// TODO: Zahlung eines Auftrags in eine Zahlung zusammenfassen
 		// TODO: Anzahl der Seiten im nächsten Seite Button anzeigen (& zurück Seite)
@@ -347,41 +347,44 @@ public class AusgabenList extends JFrame {
 		btnPanel = new JPanel(new FlowLayout());
 		btnPanel.setBackground(theme.getBackgroundColor());
 
-		pageBefore = new JButton(dataHandler.getText("windows.list.buttons.pageBefore"));
+		if (currentPage == 1) {
+			pageBefore = new JButton(dataHandler.getText("windows.list.buttons.pageBefore"));
 
-		pageBefore.setContentAreaFilled(false);
-		pageBefore.setOpaque(true);
-		pageBefore.setBackground(theme.getButtonColor());
+			pageBefore.setContentAreaFilled(false);
+			pageBefore.setOpaque(true);
+			pageBefore.setBackground(theme.getButtonColor());
 
-		pageBefore.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				pageBefore();
-			}
-		});
+			pageBefore.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					pageBefore();
+				}
+			});
 
-		if (currentPage == 1)
 			pageBefore.setEnabled(false);
 
-		btnPanel.add(pageBefore);
+			btnPanel.add(pageBefore);
+		}
 
-		nextPage = new JButton(dataHandler.getText("windows.list.buttons.nextPage"));
+		if (currentPage == pages) {
+			nextPage = new JButton(dataHandler.getText("windows.list.buttons.nextPage"));
 
-		nextPage.setContentAreaFilled(false);
-		nextPage.setOpaque(true);
-		nextPage.setBackground(theme.getButtonColor());
+			nextPage.setContentAreaFilled(false);
+			nextPage.setOpaque(true);
+			nextPage.setBackground(theme.getButtonColor());
 
-		nextPage.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				nextPage();
-			}
-		});
+			nextPage.addActionListener(new ActionListener() {
 
-		if (currentPage == pages)
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					nextPage();
+				}
+			});
+
 			nextPage.setEnabled(false);
 
-		btnPanel.add(nextPage);
+			btnPanel.add(nextPage);
+		}
 
 		finish = new JButton(dataHandler.getText("windows.list.buttons.finish"));
 

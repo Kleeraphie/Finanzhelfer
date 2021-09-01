@@ -208,7 +208,7 @@ public class CategoriesConfigurator extends JFrame {
 		add(right, BorderLayout.EAST);
 	}
 
-	private void buildButtons() {
+	private void buildButtons() { // TODO: southPanel einbauen
 		JButton finish, nextPage;
 		JPanel btnPanel;
 

@@ -37,7 +37,7 @@ public class Main {
 			fhm.checkRecurrentExpenditures();
 
 		// TODO: später in Config einstellbar und aus ConfigManager mit getter lesen
-		theme = dataHandler.getCurrentTheme();
+		theme = dataHandler.getThemeByID(Integer.parseInt(dataHandler.getFromConfig("current_theme:")));
 		
 		window = new MainWindow();
 

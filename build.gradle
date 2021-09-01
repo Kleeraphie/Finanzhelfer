@@ -31,4 +31,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     
     implementation 'com.google.code.gson:gson:2.8.6'
+    
+    implementation 'org.jfree:jfreechart:1.5.2'
 }

@@ -24,8 +24,6 @@ import de.kleeraphie.finanzhelfer.main.Main;
 public class GeneralCategory extends JPanel {
 
 	private static final long serialVersionUID = 2614184109652521435L;
-
-	// TODO: er speichert das falsche Theme (die ID-Findung ist falsch)
 	
 	private Theme theme;
 	private GridBagConstraints c;
@@ -117,7 +115,7 @@ public class GeneralCategory extends JPanel {
 			}
 		}
 
-		currs.setSelectedItem(dataHandler.getCurrentSymbols());
+		currs.setSelectedItem(dataHandler.getFromConfig("current_symbols:"));
 
 		// TODO: px-Reihe rechts & unten von Pfeilkasten entfernen
 		currs.setUI(new BasicComboBoxUI() {
@@ -135,7 +133,7 @@ public class GeneralCategory extends JPanel {
 		for (String theme : themeList)
 			themes.addItem(theme);
 
-		themes.setSelectedItem(themeList.get(dataHandler.getCurrentTheme().getID()));
+		themes.setSelectedItem(themeList.get(Integer.parseInt(dataHandler.getFromConfig("current_theme:"))));
 
 		// TODO: px-Reihe rechts & unten von Pfeilkasten entfernen
 		themes.setUI(new BasicComboBoxUI() {
@@ -171,7 +169,7 @@ public class GeneralCategory extends JPanel {
 				try {
 					dataHandler.changeLanguage(dataHandler.getLangCodeByLangName((String) langs.getSelectedItem()));
 					dataHandler.changeSymbols((String) currs.getSelectedItem());
-					dataHandler.changeTheme((String) themes.getSelectedItem());
+					dataHandler.changeTheme(themes.getSelectedIndex());
 
 					((Window) getRootPane().getParent()).dispose();
 					Main.window.refresh();
