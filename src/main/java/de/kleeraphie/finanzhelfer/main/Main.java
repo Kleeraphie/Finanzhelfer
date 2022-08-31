@@ -36,8 +36,8 @@ public class Main {
 		else // damit er das nicht bei einen leeren fhm macht
 			fhm.checkRecurrentExpenditures();
 
-		// TODO: später in Config einstellbar und aus ConfigManager mit getter lesen
-		theme = dataHandler.getThemeByID(Integer.parseInt(dataHandler.getFromConfig("current_theme:")));
+		// TODO: spï¿½ter in Config einstellbar und aus ConfigManager mit getter lesen
+		theme = dataHandler.getThemeByID(Integer.parseInt(dataHandler.getFromConfig("current_theme")));
 		
 		window = new MainWindow();
 

@@ -10,8 +10,8 @@ public class FinanzhelferManager {
 
 	public Finanzhelfer creating;
 	public ArrayList<Finanzhelfer> fhList;
-	private ArrayList<Kategorie> creatingCategorieList;
-	// creatingCategorieList ist nur während des Erstellens nötig;
+	private ArrayList<Kategorie> creatingCategoryList;
+	// creatingCategoryList ist nur während des Erstellens nötig;
 	// wird später den creating übergeben
 
 	public FinanzhelferManager() {
@@ -44,7 +44,7 @@ public class FinanzhelferManager {
 
 	public void newFinanzhelfer() {
 		creating = new Finanzhelfer();
-		creatingCategorieList = new ArrayList<>();
+		creatingCategoryList = new ArrayList<>();
 	}
 
 	// public void setName(String name) {
@@ -57,16 +57,16 @@ public class FinanzhelferManager {
 	//
 	// public void setSpartenAmount(int amount) {
 	// for (int i = 0; i < amount; i++) {
-	// creatingCategorieList.add(new Kategorie());
+	// creatingCategoryList.add(new Kategorie());
 	// }
 	// }
 	//
 	// public int getSpartenAmount() {
-	// return creatingCategorieList.size();
+	// return creatingCategoryList.size();
 	// }
 	//
 	// public ArrayList<Kategorie> getCreatingSpartenList() {
-	// return creatingCategorieList;
+	// return creatingCategoryList;
 	// }
 	//
 	// public void finishCreatingSpartenList(ArrayList<Kategorie> spartenList) {
@@ -75,7 +75,7 @@ public class FinanzhelferManager {
 
 	public void abortCreating() {
 		creating = null;
-		creatingCategorieList = null;
+		creatingCategoryList = null;
 	}
 
 	public void finish() {
@@ -199,8 +199,8 @@ public class FinanzhelferManager {
 		if (creating == null)
 			return "FinanzhelferManager[fhList: " + fhs + "]";
 		else
-			return "FinanzhelferManager[fhList:" + fhs + "; creating:" + creating.toString()
-					+ "; creatingCategorieList:" + creatingCategorieList.toString() + "]";
+			return "FinanzhelferManager[fhList:" + fhs + "; creating:" + creating
+					+ "; creatingCategoryList:" + creatingCategoryList.toString() + "]";
 	}
 
 }

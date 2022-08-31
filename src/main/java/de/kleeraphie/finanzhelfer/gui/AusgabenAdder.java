@@ -79,7 +79,7 @@ public class AusgabenAdder extends JFrame {
 	}
 
 	private void buildLabels() {
-		JLabel categorie, name, info, cost, times, transactionType;
+		JLabel category, name, info, cost, times, transactionType;
 
 		c.anchor = GridBagConstraints.CENTER;
 		c.weightx = 1;
@@ -87,8 +87,8 @@ public class AusgabenAdder extends JFrame {
 		c.gridx = 0;
 		c.gridy = 0;
 
-		categorie = new JLabel(dataHandler.getText("windows.add.labels.categorie"));
-		add(categorie, c);
+		category = new JLabel(dataHandler.getText("windows.add.labels.category"));
+		add(category, c);
 
 		c.gridy++;
 		transactionType = new JLabel(dataHandler.getText("windows.add.labels.transactionType"));
@@ -122,7 +122,7 @@ public class AusgabenAdder extends JFrame {
 		String symbol = currency.getSymbol(); // Währungssymbol
 		DecimalFormatSymbols symbols = new DecimalFormatSymbols(loc);
 
-		// TODO: rausfinden, wozu die einzelenen Formatter da sind
+		// TODO: rausfinden, wozu die einzelnen Formatter da sind
 		// create the formatters, default, display, edit
 		NumberFormatter defaultFormatter = new NumberFormatter(new DecimalFormat("#.##"));
 		NumberFormatter displayFormatter = new NumberFormatter(new DecimalFormat("#,##0.## " + symbol, symbols));
@@ -152,7 +152,7 @@ public class AusgabenAdder extends JFrame {
 		add(categories, c);
 		
 		c.gridy++;
-		types = new JComboBox<String>();
+		types = new JComboBox<>();
 		types.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 		
 		types.addItem(dataHandler.getText("windows.add.types.expenditure"));
@@ -295,18 +295,18 @@ public class AusgabenAdder extends JFrame {
 	}
 
 	private void addAusgabe() {
-		Kategorie currentCategorie = Main.fhm.getCurrent().getCategorieByName((String) categories.getSelectedItem());
+		Kategorie currentCategory = Main.fhm.getCurrent().getCategoryByName((String) categories.getSelectedItem());
 		double money = Double.parseDouble(cost.getText().replace(".", "").replace(',', '.').replace('€', ' '));
 
 		if (types.getSelectedItem().toString().equals("Ausgabe")) {
-			money  = -money;
+			money  *= -1;
 		}
 			
 		
 		Zahlung payment = new Zahlung(name.getText(), info.getText(), money);
 		
-		if (money > currentCategorie.getMoneyLeft()) {
-			String message = String.format(dataHandler.getText("windows.add.dialogues.toExpensive"), money, dataHandler.getText("currency.symbol1"), currentCategorie.getMoneyLeft(), dataHandler.getText("currency.symbol1"));
+		if (money > currentCategory.getMoneyLeft()) {
+			String message = String.format(dataHandler.getText("windows.add.dialogues.toExpensive"), money, dataHandler.getText("currency.symbol1"), currentCategory.getMoneyLeft(), dataHandler.getText("currency.symbol1"));
 
 			JOptionPane.showMessageDialog(this, message, dataHandler.getText("windows.add.dialogues.error"), JOptionPane.WARNING_MESSAGE);
 
@@ -314,7 +314,7 @@ public class AusgabenAdder extends JFrame {
 		}
 
 		String selected = String.valueOf(categories.getSelectedItem());
-		Kategorie current = Main.fhm.getCurrent().getCategorieByName(selected);
+		Kategorie current = Main.fhm.getCurrent().getCategoryByName(selected);
 
 		if (timesTypes.getSelectedItem().toString().equals(dataHandler.getText("windows.add.types.order"))) {
 			int delay = ((int) ((JFormattedTextField) howOftenEntries.getComponent(1)).getValue());

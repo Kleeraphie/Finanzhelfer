@@ -7,14 +7,14 @@ public class Zahlung {
 
 	private String name, info;
 	private double cost;
-	private LocalDateTime creation;
+	private final LocalDateTime CREATION_DATE;
 
 	public Zahlung(String name, String info, double cost) {
 		this.name = name;
 		this.info = info;
 		this.cost = cost;
 
-		creation = LocalDateTime.now(ZoneId.systemDefault());
+		CREATION_DATE = LocalDateTime.now(ZoneId.systemDefault());
 	}
 
 	public Zahlung(String name, double cost) {
@@ -46,16 +46,16 @@ public class Zahlung {
 	}
 
 	public LocalDateTime getCreationDate() {
-		return creation;
+		return CREATION_DATE;
 	}
 
 	@Override
 	public String toString() {
 		// TODO: Zahlungen == 0 verbieten
 		if (cost > 0)
-			return "Einnahme[name:" + name + "; info:" + info + "; cost:" + cost + "; creation:" + creation + "]";
+			return "Einnahme[name:" + name + "; info:" + info + "; cost:" + cost + "; creation:" + CREATION_DATE + "]";
 		else
-			return "Ausgabe[name:" + name + "; info:" + info + "; cost:" + cost + "; creation:" + creation + "]";
+			return "Ausgabe[name:" + name + "; info:" + info + "; cost:" + cost + "; creation:" + CREATION_DATE + "]";
 	}
 
 }

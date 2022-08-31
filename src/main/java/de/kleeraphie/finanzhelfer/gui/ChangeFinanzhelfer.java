@@ -175,7 +175,7 @@ public class ChangeFinanzhelfer extends JFrame {
 
 				currentName.setText(currentFH.getName());
 				// TODO: Währungssymbol in Config änderbar
-				currentMoney.setText(String.valueOf(moneyFormat.format(currentFH.getMoneyLeft())) + " "
+				currentMoney.setText(moneyFormat.format(currentFH.getMoneyLeft()) + " "
 						+ dataHandler.getText("currency.symbol1") + " / " + currentFH.getMoney() + " "
 						+ dataHandler.getText("currency.symbol1")); // TODO: vllt. zu currency.getSymbol ändern wie
 																	// sonst überall
@@ -317,12 +317,7 @@ public class ChangeFinanzhelfer extends JFrame {
 		pageBefore.setOpaque(true);
 		pageBefore.setBackground(theme.getButtonColor());
 
-		pageBefore.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				pageBefore();
-			}
-		});
+		pageBefore.addActionListener(e -> changePage(-1));
 
 		if (currentPage == 1)
 			pageBefore.setEnabled(false);
@@ -334,13 +329,7 @@ public class ChangeFinanzhelfer extends JFrame {
 		nextPage.setContentAreaFilled(false);
 		nextPage.setOpaque(true);
 		nextPage.setBackground(theme.getButtonColor());
-
-		nextPage.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				nextPage();
-			}
-		});
+		nextPage.addActionListener(e -> changePage(1));
 
 		if (currentPage == pages)
 			nextPage.setEnabled(false);
@@ -352,89 +341,54 @@ public class ChangeFinanzhelfer extends JFrame {
 		finish.setContentAreaFilled(false);
 		finish.setOpaque(true);
 		finish.setBackground(theme.getButtonColor());
+		finish.addActionListener(e -> dispose());
 
-		finish.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-			}
-		});
 		btnPanel.add(finish);
 
 		southPanel.add(btnPanel, c);
 		add(southPanel, BorderLayout.SOUTH);
 	}
 
-	private void nextPage() {
-		currentPage++;
-
-		getContentPane().removeAll();
-
-		revalidate();
-		repaint();
-
-		buildCells();
-		buildButtons();
+	private void changePage(int add) {
+		currentPage += add;
+		rebuildWindow();
 	}
 
-	private void pageBefore() {
-		currentPage--;
-
+	private void rebuildWindow() {
 		getContentPane().removeAll();
-
-		revalidate();
-		repaint();
 
 		buildCells();
 		buildButtons();
+
+		revalidate();
+		repaint();
 	}
 
 	private void setFocusToCurrentFH() {
-		List<JButton> allButtons = new ArrayList<JButton>();
+		List<JButton> allButtons = new ArrayList<>();
 
 		allButtons.addAll(getAllButtons(left));
 		allButtons.addAll(getAllButtons(middle));
 		allButtons.addAll(getAllButtons(right));
 
+		// alten Button nicht mehr selecten
 		for (int i = 0; i < Main.fhm.fhList.size(); i++) {
 
-			if (i < 3) { // Klammern müssen da sonst else zum if darunter gehört (glaube ich)
 				// TODO: vllt. fixen
-				if (((JButton) left.getComponent(i)).isSelected()) {
-					System.out.println(left.getComponent(i));
-					((JButton) left.getComponent(i)).setSelected(false);
+				if (allButtons.get(i).isSelected()) {
+					System.out.println(allButtons.get(i));
+					allButtons.get(i).setSelected(false);
 				}
-
-			} else if (i < 6) {
-				if (((JButton) middle.getComponent(i - 3)).isSelected())
-					((JButton) middle.getComponent(i - 3)).setSelected(false);
-
-			} else // i < 9
-			if (((JButton) right.getComponent(i - 6)).isSelected())
-				((JButton) right.getComponent(i - 6)).setSelected(false);
 
 		}
 
+		// neuen Button selecten und diesen FH als selected speichern
 		for (int i = 0; i < Main.fhm.fhList.size(); i++) {
 
-			if (i < 3) {
-				if (getFinanzhelferFromButton((JButton) left.getComponent(i)).isCurrent()) {
-					left.getComponent(i).requestFocus();
-					selected = getFinanzhelferFromButton((JButton) left.getComponent(i));
-					break;
-				}
-			} else if (i < 6) {
-				if (getFinanzhelferFromButton((JButton) middle.getComponent(i - 3)).isCurrent()) {
-					middle.getComponent(i - 3).requestFocus();
-					selected = getFinanzhelferFromButton((JButton) middle.getComponent(i - 3));
-					break;
-				}
-			} else { // i < 9
-				if (getFinanzhelferFromButton((JButton) right.getComponent(i - 6)).isCurrent()) {
-					right.getComponent(i - 6).requestFocus();
-					selected = getFinanzhelferFromButton((JButton) right.getComponent(i - 6));
-					break;
-				}
+			if (getFinanzhelferFromButton(allButtons.get(i)).isCurrent()) {
+				allButtons.get(i).requestFocus();
+				selected = getFinanzhelferFromButton(allButtons.get(i));
+				break;
 			}
 
 		}
@@ -443,7 +397,7 @@ public class ChangeFinanzhelfer extends JFrame {
 
 	private List<JButton> getAllButtons(final Container c) {
 		Component[] comps = c.getComponents();
-		List<JButton> compList = new ArrayList<JButton>();
+		List<JButton> compList = new ArrayList<>();
 		for (Component comp : comps) {
 			if (comp instanceof JButton)
 				compList.add((JButton) comp);
@@ -460,7 +414,7 @@ public class ChangeFinanzhelfer extends JFrame {
 	}
 
 	private Finanzhelfer getFinanzhelferFromButton(JButton btn) {
-		List<UUID> allFhIDs = new ArrayList<UUID>();
+		List<UUID> allFhIDs = new ArrayList<>();
 
 		for (Finanzhelfer current : Main.fhm.fhList)
 			allFhIDs.add(current.getUUID());
@@ -472,7 +426,7 @@ public class ChangeFinanzhelfer extends JFrame {
 	}
 
 	private JButton getSelectedBtn() {
-		List<JButton> allButtons = new ArrayList<JButton>();
+		List<JButton> allButtons = new ArrayList<>();
 
 		allButtons.addAll(getAllButtons(left));
 		allButtons.addAll(getAllButtons(middle));

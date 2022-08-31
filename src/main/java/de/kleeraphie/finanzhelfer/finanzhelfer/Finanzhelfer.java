@@ -8,7 +8,7 @@ public class Finanzhelfer {
 	private double money, moneyLeft;
 	private Kategorie[] categories;
 	private boolean current, standard;
-	private UUID uuid;
+	private final UUID UUID;
 	// money = Gehalt; moneyLeft = übriges Geld (nach ausgaben)
 
 	public Finanzhelfer(String name, String info, double money, Kategorie[] categories, boolean current, boolean standard) {
@@ -19,7 +19,7 @@ public class Finanzhelfer {
 		this.categories = categories;
 		this.current = current;
 		this.standard = standard;
-		this.uuid = UUID.randomUUID();
+		this.UUID = java.util.UUID.randomUUID();
 	}
 
 	public Finanzhelfer() {
@@ -72,8 +72,8 @@ public class Finanzhelfer {
 		this.moneyLeft = 0d;
 
 		if (categories != null)
-		for (Kategorie current : categories)
-			this.moneyLeft += current.getMoneyLeft();
+			for (Kategorie current : categories)
+				this.moneyLeft += current.getMoneyLeft();
 
 	}
 
@@ -81,7 +81,7 @@ public class Finanzhelfer {
 		return categories;
 	}
 
-	public Kategorie getCategorieByName(String name) {
+	public Kategorie getCategoryByName(String name) {
 
 		for (Kategorie current : categories) {
 			if (current.getName().equals(name))
@@ -159,7 +159,7 @@ public class Finanzhelfer {
 	// }
 	
 	public UUID getUUID() {
-		return uuid;
+		return UUID;
 	}
 
 }

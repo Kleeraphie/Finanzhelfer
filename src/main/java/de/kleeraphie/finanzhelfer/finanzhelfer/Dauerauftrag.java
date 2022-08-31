@@ -23,7 +23,7 @@ public class Dauerauftrag {
 	}
 
 	public boolean hasHappened() {
-		return ChronoUnit.DAYS.between(timer, LocalDateTime.now()) >= 0 ? true : false;
+		return ChronoUnit.DAYS.between(timer, LocalDateTime.now()) >= 0;
 	}
 
 	public Zahlung getPayment() {

@@ -190,19 +190,13 @@ public class TransactionList extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				currentCategorie = Main.fhm.getCurrent().getCategorieByName(categories.getSelectedItem().toString());
+				currentCategorie = Main.fhm.getCurrent().getCategoryByName(categories.getSelectedItem().toString());
 
-				// Werte neu berechnen, damit sie mit den Werten der neuen Kategorie
-				// übereinstimmen
+				// Werte neu berechnen, damit sie mit den Werten der neuen Kategorie übereinstimmen
 				ausgabenAmount = getAusgabenAmount();
 				pages = (int) Math.ceil((double) ausgabenAmount / 9);
 
-				getContentPane().removeAll();
-
-				buildCells();
-				buildButtons();
-
-				revalidate();
+				rebuildWindow();
 			}
 		});
 
@@ -220,109 +214,103 @@ public class TransactionList extends JFrame {
 
 		for (int i = 0; i < 9; i++) {
 
-			if ((9 * (currentPage - 1) + i) < ausgabenAmount) { // damit nicht 9 auf einer Seite, obwohl es nicht so
-																// viele gibt
+			if ((9 * (currentPage - 1) + i) >= ausgabenAmount) break;// damit nur so viele auf der Seite wie nötig sind
 
-				cell = new JPanel(new GridBagLayout());
-				cell.setBackground(theme.getBackgroundColor());
+			cell = new JPanel(new GridBagLayout());
+			cell.setBackground(theme.getBackgroundColor());
 
-				c.anchor = GridBagConstraints.CENTER;
+			c.anchor = GridBagConstraints.CENTER;
 
-				currentAusgabe = currentCategorie.getPayments().get(9 * (currentPage - 1) + i);
+			currentAusgabe = currentCategorie.getPayments().get(9 * (currentPage - 1) + i);
 
-				currentMoneyLabel = new JLabel();
-				currentInfoLabel = new JLabel();
-				created = new JLabel();
+			currentMoneyLabel = new JLabel();
+			currentInfoLabel = new JLabel();
+			created = new JLabel();
 
-				currentName = new JLabel();
-				currentMoney = new JLabel();
-				creationDate = new JLabel();
+			currentName = new JLabel();
+			currentMoney = new JLabel();
+			creationDate = new JLabel();
 
-				currentInfo = new JTextArea(2, 10);
+			currentInfo = new JTextArea(2, 10);
 
-				currentInfo.setBackground(theme.getFieldColor());
-				currentInfo.setEditable(false);
-				currentInfo.setLineWrap(true);
-				currentInfo.setWrapStyleWord(true);
-				JScrollPane sp = new JScrollPane(currentInfo);
-				sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+			currentInfo.setBackground(theme.getFieldColor());
+			currentInfo.setEditable(false);
+			currentInfo.setLineWrap(true);
+			currentInfo.setWrapStyleWord(true);
+			JScrollPane sp = new JScrollPane(currentInfo);
+			sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-				currentName.setFont(new Font(fett.getFontName(), fett.getStyle(), 12));
-				currentMoneyLabel.setFont(fett);
-				currentInfoLabel.setFont(fett);
-				created.setFont(fett);
+			currentName.setFont(new Font(fett.getFontName(), fett.getStyle(), 12));
+			currentMoneyLabel.setFont(fett);
+			currentInfoLabel.setFont(fett);
+			created.setFont(fett);
 
-				currentMoneyLabel.setText(dataHandler.getText("windows.list.labels.money"));
-				currentInfoLabel.setText(dataHandler.getText("windows.list.labels.info"));
-				created.setText(dataHandler.getText("windows.list.labels.date"));
+			currentMoneyLabel.setText(dataHandler.getText("windows.list.labels.money"));
+			currentInfoLabel.setText(dataHandler.getText("windows.list.labels.info"));
+			created.setText(dataHandler.getText("windows.list.labels.date"));
 
-				currentName.setText(currentAusgabe.getName());
-				// TODO: Währungssymbol in Config änderbar
-				currentMoney.setText(String.valueOf(moneyFormat.format(currentAusgabe.getCost())) + " "
-						+ dataHandler.getText("currency.symbol1")); // TODO: auch zu currency.getSymbol ändern
-				currentInfo.setText(currentAusgabe.getInfo());
+			currentName.setText(currentAusgabe.getName());
+			// TODO: Währungssymbol in Config änderbar
+			currentMoney.setText(moneyFormat.format(currentAusgabe.getCost()) + " "
+					+ dataHandler.getText("currency.symbol1")); // TODO: auch zu currency.getSymbol ändern
+			currentInfo.setText(currentAusgabe.getInfo());
 
-				// TODO: Locale aus der Config nehmen
-				DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(loc);
+			// TODO: Locale aus der Config nehmen
+			DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(loc);
 
-				creationDate.setText(currentAusgabe.getCreationDate().format(formatter));
+			creationDate.setText(currentAusgabe.getCreationDate().format(formatter));
 
-				c.gridwidth = 2;
-				c.gridx = 0;
-				c.gridy = 0;
-				c.insets = new Insets(0, 0, 0, 0); // TODO: prüfen welche wirklich nötig; wenn nur 1, dann nur das
-				// TODO: currentName mgl. nicht ganz mittig
-				if (i < 3)
-					c.insets.left = 50;
-				else if (i >= 6)
-					c.insets.right = 50;
+			c.gridwidth = 2;
+			c.gridx = 0;
+			c.gridy = 0;
+			c.insets = new Insets(0, 0, 0, 0); // TODO: prüfen welche wirklich nötig; wenn nur 1, dann nur das
+			// TODO: currentName mgl. nicht ganz mittig
+			if (i < 3)
+				c.insets.left = 50;
+			else if (i >= 6)
+				c.insets.right = 50;
 
-				cell.add(currentName, c);
+			cell.add(currentName, c);
 
-				c.anchor = GridBagConstraints.LINE_END;
-				c.gridwidth = 1;
+			c.anchor = GridBagConstraints.LINE_END;
+			c.gridwidth = 1;
 
-				if (i >= 6)
-					c.insets.right = 0;
+			if (i >= 6)
+				c.insets.right = 0;
 
-				c.gridy++;
-				cell.add(currentMoneyLabel, c);
+			c.gridy++;
+			cell.add(currentMoneyLabel, c);
 
-				c.anchor = GridBagConstraints.NORTHEAST;
+			c.anchor = GridBagConstraints.NORTHEAST;
 
-				c.gridy++;
-				cell.add(currentInfoLabel, c);
+			c.gridy++;
+			cell.add(currentInfoLabel, c);
 
-				c.gridy++;
-				cell.add(created, c);
+			c.gridy++;
+			cell.add(created, c);
 
-				c.gridx = 1;
-				c.gridy = 1;
+			c.gridx = 1;
+			c.gridy = 1;
 
-				c.insets.left = 10;
+			c.insets.left = 10;
 
-				if (i >= 6)
-					c.insets.right = 50;
+			if (i >= 6)
+				c.insets.right = 50;
 
-				cell.add(currentMoney, c);
+			cell.add(currentMoney, c);
 
-				c.gridy++;
-				cell.add(currentInfo, c);
+			c.gridy++;
+			cell.add(currentInfo, c);
 
-				c.gridy++;
-				cell.add(creationDate, c);
+			c.gridy++;
+			cell.add(creationDate, c);
 
-				if (i < 3) // TODO: vllt. durch (int) i/3 (switchcase) kürzer
-					left.add(cell);
-
-				else if (i < 6)
-					middle.add(cell);
-
-				else
-					right.add(cell);
-
-			} else
-				break;
+			if (i < 3) // TODO: vllt. durch (int) i/3 (switchcase) kürzer
+				left.add(cell);
+			else if (i < 6)
+				middle.add(cell);
+			else
+				right.add(cell);
 
 		}
 
@@ -353,14 +341,7 @@ public class TransactionList extends JFrame {
 			pageBefore.setContentAreaFilled(false);
 			pageBefore.setOpaque(true);
 			pageBefore.setBackground(theme.getButtonColor());
-
-			pageBefore.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					pageBefore();
-				}
-			});
-
+			pageBefore.addActionListener(e -> changePage(-1));
 			pageBefore.setEnabled(false);
 
 			btnPanel.add(pageBefore);
@@ -372,15 +353,7 @@ public class TransactionList extends JFrame {
 			nextPage.setContentAreaFilled(false);
 			nextPage.setOpaque(true);
 			nextPage.setBackground(theme.getButtonColor());
-
-			nextPage.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					nextPage();
-				}
-			});
-
+			nextPage.addActionListener(e -> changePage(1));
 			nextPage.setEnabled(false);
 
 			btnPanel.add(nextPage);
@@ -391,41 +364,16 @@ public class TransactionList extends JFrame {
 		finish.setContentAreaFilled(false);
 		finish.setOpaque(true);
 		finish.setBackground(theme.getButtonColor());
-
-		finish.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-			}
-		});
+		finish.addActionListener(e -> dispose());
 		btnPanel.add(finish);
 
 		southPanel.add(btnPanel, c);
 		add(southPanel, BorderLayout.SOUTH);
 	}
 
-	private void pageBefore() {
-		currentPage--;
-
-		getContentPane().removeAll();
-
-		buildCells();
-		buildButtons();
-
-		revalidate();
-		repaint();
-	}
-
-	private void nextPage() {
-		currentPage++;
-
-		getContentPane().removeAll();
-
-		buildCells();
-		buildButtons();
-
-		revalidate();
-		repaint();
+	private void changePage(int add) {
+		currentPage += add;
+		rebuildWindow();
 	}
 
 	private int getAusgabenAmount() {
@@ -437,7 +385,16 @@ public class TransactionList extends JFrame {
 		ausgabenAmount = currentCategorie.getPayments().size();
 
 		return ausgabenAmount;
+	}
 
+	private void rebuildWindow() {
+		getContentPane().removeAll();
+
+		buildCells();
+		buildButtons();
+
+		revalidate();
+		repaint();
 	}
 
 }

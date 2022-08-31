@@ -22,7 +22,7 @@ public class DataHandler {
 	private File data, config, langDir;
 	private HashMap<String, String> currentLangTexts;
 
-	// TODO: Mehrzahl bei Währung beachten
+	// TODO: Mehrzahl bei Wï¿½hrung beachten
 
 	public DataHandler() {
 		gson = new Gson();
@@ -35,7 +35,7 @@ public class DataHandler {
 
 	public void saveInData(FinanzhelferManager toSave) {
 
-		try {
+		try (FileWriter writer = new FileWriter(data)) {
 
 			if (!data.getParentFile().exists())
 				createFilesDir();
@@ -43,10 +43,7 @@ public class DataHandler {
 			if (!data.exists())
 				data.createNewFile();
 
-			FileWriter writer = new FileWriter(data);
-
 			writer.write(gson.toJson(toSave));
-			writer.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -56,9 +53,8 @@ public class DataHandler {
 
 	public String getFromConfig(String path) {
 
-		try {
+		try (BufferedReader bfr = new BufferedReader(new FileReader(config))) {
 
-			BufferedReader bfr = new BufferedReader(new FileReader(config));
 			String line;
 			String[] texts;
 
@@ -74,11 +70,8 @@ public class DataHandler {
 
 			}
 
-			bfr.close();
-
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
 		}
 		return null;
 
@@ -86,9 +79,9 @@ public class DataHandler {
 
 	private void setInConfig(String path, String toSet) {
 
-		try {
-			BufferedReader bfr = new BufferedReader(new FileReader(config));
-			StringBuffer inputBuffer = new StringBuffer();
+		try (BufferedReader bfr = new BufferedReader(new FileReader(config))) {
+
+			StringBuilder strBuilder = new StringBuilder();
 			String line;
 			String[] texts;
 
@@ -101,15 +94,13 @@ public class DataHandler {
 
 				}
 
-				inputBuffer.append(line);
-				inputBuffer.append('\n');
+				strBuilder.append(line);
+				strBuilder.append('\n');
 
 			}
 
-			bfr.close();
-
 			FileOutputStream fileOut = new FileOutputStream("files/config.yml");
-			fileOut.write(inputBuffer.toString().getBytes());
+			fileOut.write(strBuilder.toString().getBytes());
 			fileOut.close();
 
 		} catch (Exception e) {
@@ -164,7 +155,7 @@ public class DataHandler {
 		setInConfig("save_option", String.valueOf(newOption));
 	}
 
-	public String getText(String key) { // Text für Sache in richtiger Sprache returnen
+	public String getText(String key) { // Text fï¿½r Sache in richtiger Sprache returnen
 		return currentLangTexts.get(key);
 	}
 
@@ -189,14 +180,10 @@ public class DataHandler {
 
 	public ArrayList<String> allLangNames() {
 		ArrayList<String> result = new ArrayList<>(); // TODO: vllt. durch Array ersetzen
-		String currentLangCode;
 
 		for (File currentLang : langDir.listFiles()) {
-
-			currentLangCode = currentLang.getName().replace(".yml", "");
-
+			String currentLangCode = currentLang.getName().replace(".yml", "");
 			result.add(loadLanguageFile(currentLangCode).get("language.name"));
-
 		}
 
 		return result;
@@ -206,18 +193,17 @@ public class DataHandler {
 		HashMap<String, String> result = new HashMap<>();
 		File langFile = new File(langDir.getAbsolutePath() + "/" + code + ".yml");
 
-		try {
-			BufferedReader bfr = new BufferedReader(new FileReader(langFile, StandardCharsets.UTF_8));
+		try (BufferedReader bfr = new BufferedReader(new FileReader(langFile, StandardCharsets.UTF_8))) {
+
 			String line;
 			String path = "";
-			int oldTabs = 0, newTabs = 0;
+			int oldTabs = 0, newTabs;
 			String[] texts;
 
 			while ((line = bfr.readLine()) != null) {
 
-				if (line.trim().equals("")) { // letzten Teil ersetzen kommt erst, wenn es was neues gibt
+				if (line.trim().equals("")) // letzten Teil ersetzen kommt erst, wenn es was neues gibt
 					continue;
-				}
 
 				texts = line.split(":", 2);
 
@@ -247,7 +233,6 @@ public class DataHandler {
 
 			}
 
-			bfr.close();
 			return result;
 
 		} catch (Exception e) {

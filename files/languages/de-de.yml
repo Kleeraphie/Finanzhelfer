@@ -67,7 +67,7 @@ windows:
             nextPage: Weiter
         labels:
             expenditure: Ausgaben für:
-            categorie: Kategorie #%d
+            category: Kategorie #%d
             name: Name:
             money: Geld:
         dialogues:

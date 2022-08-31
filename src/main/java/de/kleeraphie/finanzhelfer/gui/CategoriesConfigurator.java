@@ -215,24 +215,16 @@ public class CategoriesConfigurator extends JFrame {
 		c.anchor = GridBagConstraints.CENTER;
 		c.gridx = 0;
 		c.gridy = 0;
+		c.insets.bottom = 20;
 
 		btnPanel = new JPanel();
 		btnPanel.setLayout(new GridBagLayout());
 		btnPanel.setBackground(theme.getBackgroundColor());
 
-		c.anchor = GridBagConstraints.CENTER;
-		c.insets.bottom = 20;
-
-		if (currentPage == pages) { // funktioniert auch wenn beide 1 sind, also wenn <= 8 Sparten konfiguriert
-									// werden müssen
+		if (currentPage == pages) { // funktioniert auch wenn beide 1 sind (wenn <= 8 Sparten konfiguriert werden)
 
 			finish = new JButton(dataHandler.getText("windows.config.buttons.finish"));
-			finish.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					finish();
-				}
-			});
+			finish.addActionListener(e -> finish());
 
 			finish.setContentAreaFilled(false);
 			finish.setOpaque(true);
@@ -245,12 +237,7 @@ public class CategoriesConfigurator extends JFrame {
 			nextPage = new JButton(dataHandler.getText("windows.config.buttons.nextPage"));
 			nextPage.setSize(100, 20);
 			nextPage.setLocation(400, 580);
-			nextPage.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					nextPage();
-				}
-			});
+			nextPage.addActionListener(e -> changePage(1));
 
 			nextPage.setContentAreaFilled(false);
 			nextPage.setOpaque(true);
@@ -295,8 +282,7 @@ public class CategoriesConfigurator extends JFrame {
 					JOptionPane.WARNING_MESSAGE);
 
 			// CategoriesConfigurator von vorne aber mit allen Werten bereits eingetragen
-			currentPage = 0;
-			nextPage();
+			changePage(-(currentPage - 1)); // damit man auf Seite 1 ist
 			return;
 		}
 
@@ -304,8 +290,9 @@ public class CategoriesConfigurator extends JFrame {
 
 		for (int i = 0; i < spartenAmount; i++) {
 			name = spartenName.get(i).getText();
-			money = Double
-					.parseDouble(spartenMoney.get(i).getText().replace(".", "").replace(',', '.').replace('€', ' '));
+			money = Double.parseDouble(spartenMoney.get(i).getText().replace(".", "")
+																	.replace(',', '.')
+																	.replace('€', ' '));
 
 			current = new Kategorie();
 			current.setName(name);
@@ -321,15 +308,19 @@ public class CategoriesConfigurator extends JFrame {
 		dispose();
 	}
 
-	private void nextPage() {
-		currentPage++;
+	private void changePage(int add) {
+		currentPage += add;
+		rebuildWindow();
+	}
 
+	private void rebuildWindow() {
 		getContentPane().removeAll();
 
 		buildCells();
 		buildButtons();
 
 		revalidate();
+		repaint();
 	}
 
 }

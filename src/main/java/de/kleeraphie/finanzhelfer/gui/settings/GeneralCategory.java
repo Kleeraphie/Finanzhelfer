@@ -95,7 +95,7 @@ public class GeneralCategory extends JPanel {
 
 		// TODO: px-Reihe rechts & unten von Pfeilkasten entfernen
 		langs.setUI(new BasicComboBoxUI() {
-			protected JButton createArrowButton() { // TODO: eigene Farbe für den Pfeil erstellen
+			protected JButton createArrowButton() { // TODO: eigene Farbe fï¿½r den Pfeil erstellen
 				return new BasicArrowButton(BasicArrowButton.SOUTH, null, null, theme.getTaskBarColor(), null);
 			}
 		});
@@ -115,11 +115,11 @@ public class GeneralCategory extends JPanel {
 			}
 		}
 
-		currs.setSelectedItem(dataHandler.getFromConfig("current_symbols:"));
+		currs.setSelectedItem(dataHandler.getFromConfig("current_symbols"));
 
 		// TODO: px-Reihe rechts & unten von Pfeilkasten entfernen
 		currs.setUI(new BasicComboBoxUI() {
-			protected JButton createArrowButton() { // TODO: eigene Farbe für den Pfeil erstellen
+			protected JButton createArrowButton() { // TODO: eigene Farbe fï¿½r den Pfeil erstellen
 				return new BasicArrowButton(BasicArrowButton.SOUTH, null, null, theme.getTaskBarColor(), null);
 			}
 		});
@@ -133,11 +133,11 @@ public class GeneralCategory extends JPanel {
 		for (String theme : themeList)
 			themes.addItem(theme);
 
-		themes.setSelectedItem(themeList.get(Integer.parseInt(dataHandler.getFromConfig("current_theme:"))));
+		themes.setSelectedItem(themeList.get(Integer.parseInt(dataHandler.getFromConfig("current_theme"))));
 
 		// TODO: px-Reihe rechts & unten von Pfeilkasten entfernen
 		themes.setUI(new BasicComboBoxUI() {
-			protected JButton createArrowButton() { // TODO: eigene Farbe für den Pfeil erstellen
+			protected JButton createArrowButton() { // TODO: eigene Farbe fï¿½r den Pfeil erstellen
 				return new BasicArrowButton(BasicArrowButton.SOUTH, null, null, theme.getTaskBarColor(), null);
 			}
 		});

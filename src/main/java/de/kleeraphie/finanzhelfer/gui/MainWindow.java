@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -15,11 +16,14 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -40,6 +44,8 @@ public class MainWindow extends JFrame {
 	private Theme theme;
 	private GridBagConstraints c;
 	private DataHandler dataHandler;
+	private Dimension screenSize;
+	private GridBagLayout layout;
 
 	public MainWindow() {
 
@@ -51,6 +57,8 @@ public class MainWindow extends JFrame {
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.NORTHWEST;
+		
+		screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // nur für Übungszwecke
 
 		buildWindow();
 		buildTaskBar();
@@ -64,13 +72,15 @@ public class MainWindow extends JFrame {
 	}
 
 	private void buildWindow() {
+		
+		layout = new GridBagLayout();
 
 		setTitle(dataHandler.getText("windows.main.title"));
 		setExtendedState(MAXIMIZED_BOTH);
 		setLocationRelativeTo(null);
 		requestFocus();
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setLayout(new GridBagLayout());
+		setLayout(layout);
 		getContentPane().setBackground(theme.getBackgroundColor());
 
 		addWindowListener(new WindowAdapter() {
@@ -89,6 +99,12 @@ public class MainWindow extends JFrame {
 		JButton createFH, switchFH, settings, newTransaction, listTransactions;
 		final boolean multFHs = Main.fhm.fhList.size() >= 2;
 
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 2;
+		c.weightx = 1;
+		c.weighty = 1;
+
 		// TODO: vllt. andere Aufteilung der Btns wenn kein FH vorhanden
 		// TODO: taskBar height wieder so wie früher
 		// TODO: Symbole für die Buttons erstellen und einfügen
@@ -97,6 +113,7 @@ public class MainWindow extends JFrame {
 		// TODO: ToolTips durch getTextArray("windows.main.buttons") machen
 
 		taskBar.setBackground(theme.getTaskBarColor());
+		add(taskBar, c);
 
 		createFH = new JButton("+");
 		createFH.setPreferredSize(new Dimension(50, 50));
@@ -208,17 +225,6 @@ public class MainWindow extends JFrame {
 
 		}
 
-		c.gridx = 0;
-		c.gridy = 0;
-		c.gridwidth = 2;
-		c.weightx = 1;
-		c.weighty = 1;
-
-		add(taskBar, c);
-
-		revalidate();
-		repaint();
-
 	}
 
 	private void buildGraphs() {
@@ -228,24 +234,28 @@ public class MainWindow extends JFrame {
 		JFreeChart chart;
 		RingPlot plot;
 		double used;
+		GridBagConstraints cGraphs;
+		JLabel name;
 
 		c.gridwidth = 1;
-		c.insets = new Insets(100, 100, 0, 200);
+		c.insets = new Insets(100, 100, 0, 200); // TODO: vllt. links nur 100
 		
+		cGraphs = new GridBagConstraints();
+
 		// Main graph
 		dataset = new DefaultPieDataset<String>();
-		
+
 		dataset.setValue("Übrig", Main.fhm.getCurrent().getMoneyLeft());
-		
+
 		used = 0d;
-		
+
 		for (Kategorie c : Main.fhm.getCurrent().getCategories()) {
 			for (Zahlung p : c.getPayments()) {
 				used += p.getCost();
 			}
 		}
 		dataset.setValue("Verbraucht", Math.abs(used));
-		
+
 		chart = ChartFactory.createRingChart(null, dataset, false, true, false);
 		plot = (RingPlot) chart.getPlot();
 
@@ -268,27 +278,44 @@ public class MainWindow extends JFrame {
 		plot.setCircular(true);
 		plot.setLabelGap(0.50);
 
+		plot.setOutlineVisible(false);
+		
 		result = new ChartPanel(chart);
 		result.setPreferredSize(new Dimension(1000, 800));
-
+		
 		add(result, c);
-		
-		
 
 		// Minor graphs
-		minorGraphs = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		minorGraphs = new JPanel(new GridBagLayout());
 		minorGraphs.setBackground(theme.getBackgroundColor());
-
-		JScrollPane scrollPane = new JScrollPane(minorGraphs);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane.setBounds(0, 0, 300, 200);
-		scrollPane.setPreferredSize(new Dimension(600, 230));
+		// TODO: mit JGridBagLayout machen, um Namen drunter zu machen
+		JScrollPane scrollPanel = new JScrollPane(minorGraphs);
+		scrollPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+//      scrollPane.setBounds(0, 0, 300, 200); TODO: nötig?
+		scrollPanel.setPreferredSize(new Dimension(600, 450)); // TODO: Tabelle soll bis nach ganz unten gehen
+		
+		scrollPanel.setBorder(BorderFactory.createEmptyBorder());
 
 		c.gridx++;
+		c.insets = new Insets(100, 0, 0, 0);
 
+		// TODO: funktioniert noch nicht
+//		//set gridheight of c to the number of rows so it can use the whole screen
+//				int rows = layout.getLayoutDimensions()[1].length;
+//				c.gridheight = rows;
+		
+		add(scrollPanel, c);
+
+		cGraphs.gridx = 0;
+		cGraphs.gridy = 0;
+		
 		for (Kategorie cat : Main.fhm.getCurrent().getCategories()) {
 			used = 0d;
+
+			name = new JLabel(cat.getName(), SwingConstants.CENTER);
+			name.setPreferredSize(new Dimension(300, 20));
+			// TODO: Text soll ein paar Pixel nach unten
 			
 			dataset = new DefaultPieDataset<String>();
 			dataset.setValue("Übrig", cat.getMoneyLeft());
@@ -319,20 +346,42 @@ public class MainWindow extends JFrame {
 			plot.setCircular(true);
 			plot.setLabelGap(0.50);
 
+			plot.setOutlineVisible(false);
+			
 			result = new ChartPanel(chart);
 			result.setPreferredSize(new Dimension(300, 200));
-
-			minorGraphs.add(result);
+			
+			
+			if (cGraphs.gridx == 0) {
+				if (cGraphs.gridy == 0) {
+			name.setBorder(BorderFactory.createMatteBorder(2, 2, 0, 2, theme.getTaskBarColor()));
+			result.setBorder(BorderFactory.createMatteBorder(0, 2, 2, 2, theme.getTaskBarColor()));
+				} else {
+					name.setBorder(BorderFactory.createMatteBorder(0, 2, 0, 2, theme.getTaskBarColor()));
+					result.setBorder(BorderFactory.createMatteBorder(0, 2, 2, 2, theme.getTaskBarColor()));
+				}
+			} else {
+				if (cGraphs.gridy == 0) {
+				name.setBorder(BorderFactory.createMatteBorder(2, 0, 0, 2, theme.getTaskBarColor()));
+				result.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 2, theme.getTaskBarColor()));
+				} else {
+					name.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, theme.getTaskBarColor()));
+					result.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 2, theme.getTaskBarColor()));
+				}
+			}
+			
+			minorGraphs.add(name, cGraphs);
+			cGraphs.gridy++;
+			minorGraphs.add(result, cGraphs);
+			cGraphs.gridy--;
+			
+			// go to the next grid
+			cGraphs.gridx = (++cGraphs.gridx) % 3;
+			if (cGraphs.gridx == 0)
+				cGraphs.gridy += 2;
+			
 		}
 
-//		testGraph = RingChart.createDemoPanel();
-//		testGraph.setPreferredSize(new Dimension(300, 200));
-//		minorGraphs.add(testGraph);
-
-		add(scrollPane, c);
-
-		repaint();
-		revalidate();
 	}
 
 	public void refresh() {

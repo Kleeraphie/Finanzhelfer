@@ -69,24 +69,14 @@ public class Settings extends JFrame {
 		general.setOpaque(true);
 		general.setContentAreaFilled(false);
 		general.setBackground(theme.getButtonColor());
-		general.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				changePanel(new GeneralCategory()); // TODO: testen
-			}
-		});
+		general.addActionListener(e -> changePanel(new GeneralCategory())); // TODO: testen
 		categories.add(general);
 
 		save = new JButton(dataHandler.getText("windows.settings.categories.save"));
 		save.setOpaque(true);
 		save.setContentAreaFilled(false);
 		save.setBackground(theme.getButtonColor());
-		save.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				changePanel(new SaveCategory());
-			}
-		});
+		save.addActionListener(e -> changePanel(new SaveCategory()));
 		categories.add(save);
 
 		add(categories, BorderLayout.WEST);
