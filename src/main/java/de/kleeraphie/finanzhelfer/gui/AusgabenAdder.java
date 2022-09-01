@@ -343,6 +343,7 @@ public class AusgabenAdder extends JFrame {
 		current.addPayment(payment);
 
 		dispose();
+		Main.window.refresh();
 	}
 
 }

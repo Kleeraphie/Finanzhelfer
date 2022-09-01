@@ -97,7 +97,7 @@ public class MainWindow extends JFrame {
 	private void buildTaskBar() {
 		JPanel taskBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JButton createFH, switchFH, settings, newTransaction, listTransactions;
-		final boolean multFHs = Main.fhm.fhList.size() >= 2;
+		boolean multFHs = Main.fhm.fhList.size() >= 2;
 
 		c.gridx = 0;
 		c.gridy = 0;
@@ -111,6 +111,7 @@ public class MainWindow extends JFrame {
 		// TODO: bei list auch Möglichkeit zum Bearbeiten einbauen
 		// mit eckigen Pfeil davor oder dahinter um Info noch anzuzeigen
 		// TODO: ToolTips durch getTextArray("windows.main.buttons") machen
+		// TODO: BUG: nach refresh() ist die Taskbar zu tief
 
 		taskBar.setBackground(theme.getTaskBarColor());
 		add(taskBar, c);
@@ -118,13 +119,7 @@ public class MainWindow extends JFrame {
 		createFH = new JButton("+");
 		createFH.setPreferredSize(new Dimension(50, 50));
 		createFH.setToolTipText(dataHandler.getText("windows.main.buttons.createFH"));
-		createFH.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new FinanzhelferCreator();
-			}
-		});
+		createFH.addActionListener(e -> new FinanzhelferCreator());
 
 		createFH.setContentAreaFilled(false);
 		createFH.setOpaque(true);
@@ -136,13 +131,7 @@ public class MainWindow extends JFrame {
 			switchFH = new JButton("W");
 			switchFH.setPreferredSize(new Dimension(50, 50));
 			switchFH.setToolTipText(dataHandler.getText("windows.main.buttons.switchFH"));
-			switchFH.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					new ChangeFinanzhelfer();
-				}
-			});
+			switchFH.addActionListener(e -> new ChangeFinanzhelfer());
 			switchFH.setContentAreaFilled(false);
 			switchFH.setOpaque(true);
 			switchFH.setBackground(theme.getButtonColor());
@@ -151,19 +140,11 @@ public class MainWindow extends JFrame {
 
 		settings = new JButton();
 		settings.setPreferredSize(new Dimension(50, 50));
-
 		settings.setToolTipText(dataHandler.getText("windows.main.buttons.settings"));
-		settings.addActionListener(new ActionListener() {
+		settings.addActionListener(e -> new Settings());
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new Settings();
-			}
-		});
-
-		Image icon;
 		try {
-			icon = ImageIO.read(new File("src/main/java/de/kleeraphie/finanzhelfer/graphics/settings.png"));
+			Image icon = ImageIO.read(new File("src/main/java/de/kleeraphie/finanzhelfer/graphics/settings.png"));
 
 			settings.setIcon(new ImageIcon(icon));
 
@@ -188,13 +169,7 @@ public class MainWindow extends JFrame {
 				newTransaction.setLocation(175, 25);
 
 			newTransaction.setToolTipText(dataHandler.getText("windows.main.buttons.newTransaction"));
-			newTransaction.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					new AusgabenAdder();
-				}
-			});
+			newTransaction.addActionListener(e -> new AusgabenAdder());
 
 			newTransaction.setContentAreaFilled(false);
 			newTransaction.setOpaque(true);
@@ -210,13 +185,7 @@ public class MainWindow extends JFrame {
 				listTransactions.setLocation(250, 25);
 
 			listTransactions.setToolTipText(dataHandler.getText("windows.main.buttons.listTransactions"));
-			listTransactions.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					new TransactionList();
-				}
-			});
+			listTransactions.addActionListener(e -> new TransactionList());
 
 			listTransactions.setContentAreaFilled(false);
 			listTransactions.setOpaque(true);
@@ -243,7 +212,7 @@ public class MainWindow extends JFrame {
 		cGraphs = new GridBagConstraints();
 
 		// Main graph
-		dataset = new DefaultPieDataset<String>();
+		dataset = new DefaultPieDataset<>();
 
 		dataset.setValue("Übrig", Main.fhm.getCurrent().getMoneyLeft());
 
@@ -393,12 +362,13 @@ public class MainWindow extends JFrame {
 		dataHandler = Main.dataHandler;
 		theme = Main.theme;
 
-		revalidate();
-		repaint();
+
 		// TODO: Bug: Fenster nicht mehr maximiert
-		buildWindow();
 		buildTaskBar();
 		buildGraphs();
+
+		revalidate();
+		repaint();
 
 	}
 

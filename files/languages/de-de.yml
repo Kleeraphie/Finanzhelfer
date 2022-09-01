@@ -89,7 +89,7 @@ windows:
         buttons:
             finish: Fertigstellen
         labels:
-            categorie: Kategorie:
+            category: Kategorie:
             transactionType: Zahlungstyp:
             name: Name:
             info: Informationen:

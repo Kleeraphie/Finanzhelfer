@@ -4,8 +4,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
@@ -93,7 +91,6 @@ public class FinanzhelferCreator extends JFrame {
 		fhm.newFinanzhelfer();
 
 	}
-
 	private void buildWindow() {
 
 		setTitle(dataHandler.getText("windows.creating.title"));
@@ -210,13 +207,7 @@ public class FinanzhelferCreator extends JFrame {
 		JButton nextPage;
 
 		nextPage = new JButton(dataHandler.getText("windows.creating.buttons.nextPage"));
-		nextPage.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				nextPage();
-			}
-		});
+		nextPage.addActionListener(e -> nextPage());
 
 		nextPage.setContentAreaFilled(false);
 		nextPage.setOpaque(true);

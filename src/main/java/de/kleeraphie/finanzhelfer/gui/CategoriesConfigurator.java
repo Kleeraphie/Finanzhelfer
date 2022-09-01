@@ -6,8 +6,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
@@ -128,7 +126,7 @@ public class CategoriesConfigurator extends JFrame {
 				cell.setLayout(new GridBagLayout());
 				cell.setBackground(theme.getBackgroundColor());
 
-				currentNumberLabel = new JLabel(String.format(dataHandler.getText("windows.config.labels.categorie"),
+				currentNumberLabel = new JLabel(String.format(dataHandler.getText("windows.config.labels.category"),
 						(8 * (currentPage - 1) + (i + 1))));
 				currentNameLabel = new JLabel(dataHandler.getText("windows.config.labels.name"));
 				currentMoneyLabel = new JLabel(dataHandler.getText("windows.config.labels.money"));
