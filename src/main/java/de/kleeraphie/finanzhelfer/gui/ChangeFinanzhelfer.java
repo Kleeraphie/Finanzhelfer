@@ -124,128 +124,121 @@ public class ChangeFinanzhelfer extends JFrame {
 
 		for (int i = 0; i < 9; i++) {
 
-			// TODO: Zeichen wenn er standard ist und eins wenn er current ist (oder nur das
-			// er am Anfang umrahmt ist?)
+			// TODO: Zeichen wenn er standard ist und eins wenn er current ist (oder nur das er am Anfang umrahmt ist?)
 
-			if ((9 * (currentPage - 1) + i) < fhAmount) { // damit nicht 9 auf einer Seite, obwohl es nicht so
-															// viele gibt
+			if ((9 * (currentPage - 1) + i) >= fhAmount)
+				break;// damit nicht 9 auf einer Seite, obwohl es nicht so viele gibt
 
-				cell = new JPanel(new GridBagLayout());
-				cell.setBackground(theme.getBackgroundColor());
+			cell = new JPanel(new GridBagLayout());
+			cell.setBackground(theme.getBackgroundColor());
 
-				cellBtn = new JButton();
+			cellBtn = new JButton();
 
-				c.anchor = GridBagConstraints.CENTER;
+			c.anchor = GridBagConstraints.CENTER;
 
-				currentFH = allFHs.get(9 * (currentPage - 1) + i);
+			currentFH = allFHs.get(9 * (currentPage - 1) + i);
 
-				currentMoneyLabel = new JLabel();
-				currentInfoLabel = new JLabel();
+			currentMoneyLabel = new JLabel();
+			currentInfoLabel = new JLabel();
+			currentName = new JLabel();
+			currentMoney = new JLabel();
 
-				currentName = new JLabel();
-				currentMoney = new JLabel();
+			currentInfo = new JTextArea(2, 10);
 
-				currentInfo = new JTextArea(2, 10);
+			currentInfo.setBackground(theme.getFieldColor());
 
-				currentInfo.setBackground(theme.getFieldColor());
+			// if (currentFH.getInfo() != null)
+			currentInfo.setEditable(false);
+			currentInfo.setLineWrap(true);
+			currentInfo.setWrapStyleWord(true);
+			currentInfo.addFocusListener(new FocusListener() {
+				@Override
+				public void focusLost(FocusEvent e) {
+				}
 
-				// if (currentFH.getInfo() != null)
-				currentInfo.setEditable(false);
-				currentInfo.setLineWrap(true);
-				currentInfo.setWrapStyleWord(true);
-				currentInfo.addFocusListener(new FocusListener() {
-					@Override
-					public void focusLost(FocusEvent e) {
-					}
+				@Override
+				public void focusGained(FocusEvent e) {
+					e.getComponent().getParent().getParent().requestFocus();
+				}
+			});
+			JScrollPane sp = new JScrollPane(currentInfo);
+			sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-					@Override
-					public void focusGained(FocusEvent e) {
-						e.getComponent().getParent().getParent().requestFocus();
-					}
-				});
-				JScrollPane sp = new JScrollPane(currentInfo);
-				sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+			currentName.setFont(new Font(fett.getFontName(), fett.getStyle(), 12));
+			currentMoneyLabel.setFont(fett);
+			currentInfoLabel.setFont(fett);
 
-				currentName.setFont(new Font(fett.getFontName(), fett.getStyle(), 12));
-				currentMoneyLabel.setFont(fett);
-				currentInfoLabel.setFont(fett);
+			currentMoneyLabel.setText(dataHandler.getText("windows.change.labels.money"));
+			currentInfoLabel.setText(dataHandler.getText("windows.change.labels.info"));
 
-				currentMoneyLabel.setText(dataHandler.getText("windows.change.labels.money"));
-				currentInfoLabel.setText(dataHandler.getText("windows.change.labels.info"));
+			currentName.setText(currentFH.getName());
+			// TODO: Währungssymbol in Config änderbar
+			currentMoney.setText(moneyFormat.format(currentFH.getMoneyLeft()) + " "
+					+ dataHandler.getText("currency.symbol1") + " / " + currentFH.getMoney() + " "
+					+ dataHandler.getText("currency.symbol1")); // TODO: vllt. zu currency.getSymbol ändern wie
+																// sonst überall
+			currentInfo.setText(currentFH.getInfo());
 
-				currentName.setText(currentFH.getName());
-				// TODO: Währungssymbol in Config änderbar
-				currentMoney.setText(moneyFormat.format(currentFH.getMoneyLeft()) + " "
-						+ dataHandler.getText("currency.symbol1") + " / " + currentFH.getMoney() + " "
-						+ dataHandler.getText("currency.symbol1")); // TODO: vllt. zu currency.getSymbol ändern wie
-																	// sonst überall
-				currentInfo.setText(currentFH.getInfo());
+			c.gridwidth = 2;
+			c.gridx = 0;
+			c.gridy = 0;
+			c.insets = new Insets(0, 0, 0, 0); // TODO: prüfen welche wirklich nötig; wenn nur 1, dann nur das
+			// TODO: currentName mgl. nicht ganz mittig
+			if (i < 3)
+				c.insets.left = 50;
+			else if (i >= 6)
+				c.insets.right = 50;
 
-				c.gridwidth = 2;
-				c.gridx = 0;
-				c.gridy = 0;
-				c.insets = new Insets(0, 0, 0, 0); // TODO: prüfen welche wirklich nötig; wenn nur 1, dann nur das
-				// TODO: currentName mgl. nicht ganz mittig
-				if (i < 3)
-					c.insets.left = 50;
-				else if (i >= 6)
-					c.insets.right = 50;
+			cell.add(currentName, c);
 
-				cell.add(currentName, c);
+			c.anchor = GridBagConstraints.LINE_END;
+			c.gridwidth = 1;
 
-				c.anchor = GridBagConstraints.LINE_END;
-				c.gridwidth = 1;
+			if (i >= 6)
+				c.insets.right = 0;
 
-				if (i >= 6)
-					c.insets.right = 0;
+			c.gridy++;
+			cell.add(currentMoneyLabel, c);
 
-				c.gridy++;
-				cell.add(currentMoneyLabel, c);
+			c.anchor = GridBagConstraints.NORTHEAST;
 
-				c.anchor = GridBagConstraints.NORTHEAST;
+			c.gridy++;
+			cell.add(currentInfoLabel, c);
 
-				c.gridy++;
-				cell.add(currentInfoLabel, c);
+			c.gridx = 1;
+			c.gridy = 1;
 
-				c.gridx = 1;
-				c.gridy = 1;
+			c.insets.left = 10;
 
-				c.insets.left = 10;
+			if (i >= 6)
+				c.insets.right = 50;
 
-				if (i >= 6)
-					c.insets.right = 50;
+			cell.add(currentMoney, c);
 
-				cell.add(currentMoney, c);
+			c.gridy++;
+			cell.add(currentInfo, c);
 
-				c.gridy++;
-				cell.add(currentInfo, c);
+			cellBtn.add(cell);
+			// TODO: UUID durch Nummer des Btns ersetzen da es so unsicher ist
+			cellBtn.setName(currentFH.getUUID().toString());
+			cellBtn.addActionListener(new ActionListener() {
 
-				cellBtn.add(cell);
-				// TODO: UUID durch Nummer des Btns ersetzen da es so unsicher ist
-				cellBtn.setName(currentFH.getUUID().toString());
-				cellBtn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selected = getFinanzhelferFromButton(getSelectedBtn());
+					reloadSouthernButtons();
+//					System.out.println(selected.getUUID());
+				}
+			});
 
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						selected = getFinanzhelferFromButton(getSelectedBtn());
-						reloadSouthernButtons();
-//						System.out.println(selected.getUUID());
-					}
-				});
+			// btnGroup.add(cellBtn);
 
-				// btnGroup.add(cellBtn);
-
-				if (i < 3) // TODO: vllt. durch (int) i/3 (switchcase) kürzer
-					left.add(cellBtn);
-
-				else if (i < 6)
-					middle.add(cellBtn);
-
-				else
-					right.add(cellBtn);
-
-			} else
-				break;
+			if (i < 3) // TODO: vllt. durch (int) i/3 (switchcase) kürzer
+				left.add(cellBtn);
+			else if (i < 6)
+				middle.add(cellBtn);
+			else
+				right.add(cellBtn);
 
 		}
 
@@ -270,26 +263,28 @@ public class ChangeFinanzhelfer extends JFrame {
 		btnPanel = new JPanel(new FlowLayout());
 		btnPanel.setBackground(theme.getBackgroundColor());
 
-		setCurrent = new JButton(
-				String.format(dataHandler.getText("windows.change.buttons.current"), selected.getName()));
-		// TODO: Namen überarbeiten
+		if (selected != null) {
+			setCurrent = new JButton(
+					String.format(dataHandler.getText("windows.change.buttons.current"), selected.getName()));
+			// TODO: Namen überarbeiten
 
-		setCurrent.setContentAreaFilled(false);
-		setCurrent.setOpaque(true);
-		setCurrent.setBackground(theme.getButtonColor());
+			setCurrent.setContentAreaFilled(false);
+			setCurrent.setOpaque(true);
+			setCurrent.setBackground(theme.getButtonColor());
 
-		setCurrent.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Main.fhm.setCurrent(selected);
-				dispose();
-			}
-		});
+			setCurrent.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Main.fhm.setCurrent(selected);
+					dispose();
+				}
+			});
 
-		if (selected.getUUID() == (Main.fhm.getCurrent().getUUID()))
-			setCurrent.setEnabled(false);
+			if (selected.getUUID() == (Main.fhm.getCurrent().getUUID()))
+				setCurrent.setEnabled(false);
 
-		btnPanel.add(setCurrent);
+			btnPanel.add(setCurrent);
+		}
 
 		setStandard = new JButton(dataHandler.getText("windows.change.buttons.standard"));
 
@@ -306,7 +301,7 @@ public class ChangeFinanzhelfer extends JFrame {
 			}
 		});
 
-		if (selected.getUUID() == (Main.fhm.getStandard().getUUID()))
+		if (selected != null && selected.getUUID() == (Main.fhm.getStandard().getUUID()))
 			setStandard.setEnabled(false);
 
 		btnPanel.add(setStandard);
@@ -385,6 +380,8 @@ public class ChangeFinanzhelfer extends JFrame {
 		// neuen Button selecten und diesen FH als selected speichern
 		for (int i = 0; i < Main.fhm.fhList.size(); i++) {
 
+			System.out.println(allButtons.get(i));
+
 			if (getFinanzhelferFromButton(allButtons.get(i)).isCurrent()) {
 				allButtons.get(i).requestFocus();
 				selected = getFinanzhelferFromButton(allButtons.get(i));
@@ -416,8 +413,7 @@ public class ChangeFinanzhelfer extends JFrame {
 	private Finanzhelfer getFinanzhelferFromButton(JButton btn) {
 		List<UUID> allFhIDs = new ArrayList<>();
 
-		for (Finanzhelfer current : Main.fhm.fhList)
-			allFhIDs.add(current.getUUID());
+		Main.fhm.fhList.forEach(fh -> allFhIDs.add(fh.getUUID()));
 
 		if (allFhIDs.contains(UUID.fromString(btn.getName())))
 			return Main.fhm.getFinanzhelferByUUID(UUID.fromString(btn.getName()));

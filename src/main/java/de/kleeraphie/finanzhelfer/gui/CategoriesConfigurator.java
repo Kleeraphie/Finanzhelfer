@@ -119,86 +119,84 @@ public class CategoriesConfigurator extends JFrame {
 
 		for (int i = 0; i < 8; i++) {
 
-			if ((8 * (currentPage - 1) + i) < spartenAmount) {// damit er nicht 8 auf eine Seite macht, obwohl man
-																// nicht so viel braucht
+			if ((8 * (currentPage - 1) + i) >= spartenAmount)
+				break;// damit er nicht 8 auf eine Seite macht, obwohl man nicht so viel braucht
 
-				cell = new JPanel();
-				cell.setLayout(new GridBagLayout());
-				cell.setBackground(theme.getBackgroundColor());
+			cell = new JPanel();
+			cell.setLayout(new GridBagLayout());
+			cell.setBackground(theme.getBackgroundColor());
 
-				currentNumberLabel = new JLabel(String.format(dataHandler.getText("windows.config.labels.category"),
-						(8 * (currentPage - 1) + (i + 1))));
-				currentNameLabel = new JLabel(dataHandler.getText("windows.config.labels.name"));
-				currentMoneyLabel = new JLabel(dataHandler.getText("windows.config.labels.money"));
+			currentNumberLabel = new JLabel(String.format(dataHandler.getText("windows.config.labels.category"),
+					(8 * (currentPage - 1) + (i + 1))));
+			currentNameLabel = new JLabel(dataHandler.getText("windows.config.labels.name"));
+			currentMoneyLabel = new JLabel(dataHandler.getText("windows.config.labels.money"));
 
-				c.anchor = GridBagConstraints.CENTER;
-				c.gridwidth = 2;
-				c.gridx = 0;
-				c.gridy = 0;
+			c.anchor = GridBagConstraints.CENTER;
+			c.gridwidth = 2;
+			c.gridx = 0;
+			c.gridy = 0;
 
-				if (i == 0)
-					c.insets = new Insets(20, 100, 0, 0);
-				else if (i < 4)
-					c.insets = new Insets(20, 100, 0, 0);
-				else if (i == 4)
-					c.insets = new Insets(20, 0, 0, 100);
-				else // i > 4
-					c.insets = new Insets(20, 0, 0, 100);
+			if (i == 0)
+				c.insets = new Insets(20, 100, 0, 0);
+			else if (i < 4)
+				c.insets = new Insets(20, 100, 0, 0);
+			else if (i == 4)
+				c.insets = new Insets(20, 0, 0, 100);
+			else // i > 4
+				c.insets = new Insets(20, 0, 0, 100);
 
-				cell.add(currentNumberLabel, c);
+			cell.add(currentNumberLabel, c);
 
-				c.anchor = GridBagConstraints.LINE_END;
-				c.gridwidth = 1;
-				c.insets.top = 10;
-				c.insets.right = 0;
-				c.gridy++;
-				cell.add(currentNameLabel, c);
+			c.anchor = GridBagConstraints.LINE_END;
+			c.gridwidth = 1;
+			c.insets.top = 10;
+			c.insets.right = 0;
+			c.gridy++;
+			cell.add(currentNameLabel, c);
 
-				c.gridy++;
-				cell.add(currentMoneyLabel, c);
+			c.gridy++;
+			cell.add(currentMoneyLabel, c);
 
-				c.gridx = 1;
-				c.gridy = 1;
-				c.insets.left = 20;
+			c.gridx = 1;
+			c.gridy = 1;
+			c.insets.left = 20;
 
-				if (i >= 4)
-					c.insets.right = 100;
+			if (i >= 4)
+				c.insets.right = 100;
 
-				currentName = new JTextField(24);
-				currentMoney = new JFormattedTextField(salaryFactory);
+			currentName = new JTextField(24);
+			currentMoney = new JFormattedTextField(salaryFactory);
 
-				currentMoney.setColumns(24);
+			currentMoney.setColumns(24);
 
-				currentName.setBackground(theme.getFieldColor());
-				currentMoney.setBackground(theme.getFieldColor());
+			currentName.setBackground(theme.getFieldColor());
+			currentMoney.setBackground(theme.getFieldColor());
 
-				if (spartenAmount == 0)
-					currentMoney.setValue(Main.fhm.creating.getMoney());
-				currentMoney.setValue(0);
+			if (spartenAmount == 0)
+				currentMoney.setValue(Main.fhm.creating.getMoney());
+			currentMoney.setValue(0);
 
-				cell.add(currentName, c);
+			cell.add(currentName, c);
 
-				c.gridy++;
-				cell.add(currentMoney, c);
+			c.gridy++;
+			cell.add(currentMoney, c);
 
-				if (spartenName.size() == spartenAmount) { // damit auch spartenMoney
-					currentName.setText(spartenName.get((8 * (currentPage - 1) + i)).getText());
-					currentMoney.setText(spartenMoney.get((8 * (currentPage - 1) + i)).getText());
+			if (spartenName.size() == spartenAmount) { // damit auch spartenMoney
+				currentName.setText(spartenName.get((8 * (currentPage - 1) + i)).getText());
+				currentMoney.setText(spartenMoney.get((8 * (currentPage - 1) + i)).getText());
 
-					spartenName.remove((8 * (currentPage - 1) + i));
-					spartenMoney.remove((8 * (currentPage - 1) + i));
-				}
+				spartenName.remove((8 * (currentPage - 1) + i));
+				spartenMoney.remove((8 * (currentPage - 1) + i));
+			}
 
-				spartenName.add((8 * (currentPage - 1) + i), currentName);
-				spartenMoney.add((8 * (currentPage - 1) + i), currentMoney);
-				// Zelle nun fertig
+			spartenName.add((8 * (currentPage - 1) + i), currentName);
+			spartenMoney.add((8 * (currentPage - 1) + i), currentMoney);
+			// Zelle nun fertig
 
-				if (i < 4)
-					left.add(cell);
-				else
-					right.add(cell);
-			} else
-				break;
+			if (i < 4)
+				left.add(cell);
+			else
+				right.add(cell);
 
 		}
 
@@ -262,7 +260,9 @@ public class CategoriesConfigurator extends JFrame {
 		DecimalFormat moneyFormat = new DecimalFormat("###0.##");
 
 		for (JTextField t : spartenMoney)
-			c += Double.parseDouble(t.getText().replace(".", "").replace(',', '.').replace('€', ' '));
+			c += Double.parseDouble(t.getText().replace(".", "")
+											   .replace(',', '.')
+											   .replace('€', ' '));
 
 		if (c != all) {
 			String message;

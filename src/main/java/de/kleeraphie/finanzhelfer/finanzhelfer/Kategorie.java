@@ -66,11 +66,8 @@ public class Kategorie {
 	}
 
 	public void updateMoneyLeft() {
-		this.moneyLeft = this.totalMoney;
-
-		for (Zahlung payment : this.payments)
-			this.moneyLeft += payment.getCost();
-
+		moneyLeft = totalMoney;
+		payments.forEach(payment -> moneyLeft += payment.getCost());
 	}
 
 	public ArrayList<Zahlung> getPayments() {
@@ -112,20 +109,20 @@ public class Kategorie {
 	@Override
 	public String toString() {
 
-		String paymentsToString;
+		StringBuilder paymentsToString;
 
 		if (payments.isEmpty())
-			paymentsToString = "[]";
+			paymentsToString = new StringBuilder("[]");
 		else {
 
-			paymentsToString = "[";
+			paymentsToString = new StringBuilder("[");
 
 			for (Zahlung current : payments) {
-				paymentsToString += current.toString() + "; ";
+				paymentsToString.append(current.toString()).append("; ");
 			}
 
-			paymentsToString = paymentsToString.substring(0, paymentsToString.length() - 2); // letztes "; " entfernen
-			paymentsToString += "]";
+			paymentsToString = new StringBuilder(paymentsToString.substring(0, paymentsToString.length() - 2)); // letztes "; " entfernen
+			paymentsToString.append("]");
 		}
 
 		return "Kategorie[name:" + name + "; info:" + info + "; totalMoney:" + totalMoney + "; moneyLeft:" + moneyLeft

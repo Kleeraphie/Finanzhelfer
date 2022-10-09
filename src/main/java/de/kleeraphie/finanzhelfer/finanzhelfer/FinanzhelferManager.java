@@ -21,10 +21,7 @@ public class FinanzhelferManager {
 	// TODO: später loadFromFile(config) aufrufen
 	// wo liegt die?
 	public static FinanzhelferManager load() {
-		FinanzhelferManager temp;
-
-		temp = Main.dataHandler.loadFromDataFile();
-		return temp;
+		return Main.dataHandler.loadFromDataFile();
 	}
 
 	// TODO: durch die passenden Datei ersetzen
@@ -182,18 +179,18 @@ public class FinanzhelferManager {
 
 	@Override
 	public String toString() {
-		String fhs;
+		StringBuilder fhs;
 
 		if (fhList.isEmpty())
-			fhs = "[]";
+			fhs = new StringBuilder("[]");
 		else {
-			fhs = "[";
+			fhs = new StringBuilder("[");
 
 			for (Finanzhelfer current : fhList)
-				fhs += current.toString() + "; ";
+				fhs.append(current.toString()).append("; ");
 
-			fhs = fhs.substring(0, fhs.length() - 2); // letztes Semikolon und Leerzeichen entfernen
-			fhs += "]";
+			fhs = new StringBuilder(fhs.substring(0, fhs.length() - 2)); // letztes Semikolon und Leerzeichen entfernen
+			fhs.append("]");
 		}
 
 		if (creating == null)

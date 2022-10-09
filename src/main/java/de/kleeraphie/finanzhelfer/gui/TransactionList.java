@@ -109,7 +109,7 @@ public class TransactionList extends JFrame {
 	//
 	// public static List<Component> getAllComponents(final Container c) {
 	// Component[] comps = c.getComponents();
-	// List<Component> compList = new ArrayList<Component>();
+	// List<Component> compList = new ArrayList<>();
 	// for (Component comp : comps) {
 	// compList.add(comp);
 	// if (comp instanceof Container)
@@ -213,7 +213,6 @@ public class TransactionList extends JFrame {
 		right.setBackground(theme.getBackgroundColor());
 
 		for (int i = 0; i < 9; i++) {
-
 			if ((9 * (currentPage - 1) + i) >= ausgabenAmount) break;// damit nur so viele auf der Seite wie nötig sind
 
 			cell = new JPanel(new GridBagLayout());

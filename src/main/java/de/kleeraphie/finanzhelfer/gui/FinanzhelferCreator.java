@@ -121,25 +121,16 @@ public class FinanzhelferCreator extends JFrame {
 		c.weightx = 1;
 		c.weighty = 1;
 
-		name = new JLabel(dataHandler.getText("windows.creating.labels.name"));
-
-		c.gridx = 0;
 		c.gridy = 0;
-
+		name = new JLabel(dataHandler.getText("windows.creating.labels.name"));
 		add(name, c);
 
+		c.gridy++;
 		money = new JLabel(dataHandler.getText("windows.creating.labels.money"));
-
-		c.gridx = 0;
-		c.gridy = 1;
-
 		add(money, c);
 
+		c.gridy++;
 		categories = new JLabel(dataHandler.getText("windows.creating.labels.categories"));
-
-		c.gridx = 0;
-		c.gridy = 2;
-
 		add(categories, c);
 	}
 
@@ -195,10 +186,8 @@ public class FinanzhelferCreator extends JFrame {
 			c.gridy++;
 			add(kategorien, c);
 
-		} else { // durch WarnMessage wieder hier
-			for (JTextField field : fields)
-				add(field);
-		}
+		} else // durch WarnMessage wieder hier
+			fields.forEach(this::add);
 
 	}
 

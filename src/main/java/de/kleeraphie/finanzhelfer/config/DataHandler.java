@@ -61,7 +61,6 @@ public class DataHandler {
 			while ((line = bfr.readLine()) != null) {
 
 				if (line.startsWith(path)) {
-
 					texts = line.split(":");
 					bfr.close();
 
@@ -73,6 +72,7 @@ public class DataHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		return null;
 
 	}
@@ -80,7 +80,6 @@ public class DataHandler {
 	private void setInConfig(String path, String toSet) {
 
 		try (BufferedReader bfr = new BufferedReader(new FileReader(config))) {
-
 			StringBuilder strBuilder = new StringBuilder();
 			String line;
 			String[] texts;
@@ -88,10 +87,8 @@ public class DataHandler {
 			while ((line = bfr.readLine()) != null) {
 
 				if (line.startsWith(path)) {
-
 					texts = line.split(":");
 					line = texts[0] + ": " + toSet;
-
 				}
 
 				strBuilder.append(line);
@@ -110,15 +107,11 @@ public class DataHandler {
 	}
 
 	public FinanzhelferManager loadFromDataFile() {
-		FinanzhelferManager fhm;
 
 		try {
-
 			if (data.exists()) {
 				FileReader reader = new FileReader(data);
-				fhm = gson.fromJson(reader, FinanzhelferManager.class);
-
-				return fhm;
+				return gson.fromJson(reader, FinanzhelferManager.class);
 			}
 
 		} catch (IOException e) {
@@ -126,7 +119,6 @@ public class DataHandler {
 		}
 
 		return null;
-
 	}
 
 	public File getDataFile() {
@@ -194,7 +186,6 @@ public class DataHandler {
 		File langFile = new File(langDir.getAbsolutePath() + "/" + code + ".yml");
 
 		try (BufferedReader bfr = new BufferedReader(new FileReader(langFile, StandardCharsets.UTF_8))) {
-
 			String line;
 			String path = "";
 			int oldTabs = 0, newTabs;
@@ -244,15 +235,15 @@ public class DataHandler {
 
 	private int countFrontTabs(String word) {
 		int result = 0;
-		String wordPart = "";
+		StringBuilder wordPart = new StringBuilder();
 
 		for (char c : word.toCharArray()) {
 
-			wordPart += c;
+			wordPart.append(c);
 
-			if (wordPart.equals("    ")) {
+			if (wordPart.toString().equals("    ")) {
 				result++;
-				wordPart = "";
+				wordPart = new StringBuilder();
 			} else if (wordPart.chars().allMatch(Character::isLetter))
 				break;
 
@@ -291,14 +282,13 @@ public class DataHandler {
 
 		}
 
-		throw new FileNotFoundException("Corresponding file not found for: " + name);
-
+		throw new FileNotFoundException("Corresponding file not found for language \"" + name + "\".");
 	}
 
-	public Theme getThemeByID(int theme) {
+	public Theme getThemeByID(int themeID) {
 
 		for (Theme current : Theme.values()) {
-			if (current.getID() == theme)
+			if (current.getID() == themeID)
 				return current;
 		}
 

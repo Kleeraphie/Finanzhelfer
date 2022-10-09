@@ -85,12 +85,9 @@ public class GeneralCategory extends JPanel {
 		c.gridy = 0;
 		c.gridx = 1;
 
-		langs = new JComboBox<String>();
+		langs = new JComboBox<>();
 		langs.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"); // 30x x (aber 2px zu klein)
-
-		for (String current : languages)
-			langs.addItem(current);
-
+		languages.forEach(l -> langs.addItem(l));
 		langs.setSelectedItem(dataHandler.getText("language.name")); // aktuelle Sprache
 
 		// TODO: px-Reihe rechts & unten von Pfeilkasten entfernen
@@ -127,12 +124,9 @@ public class GeneralCategory extends JPanel {
 		add(currs, c);
 
 		c.gridy++;
-		themes = new JComboBox<String>();
+		themes = new JComboBox<>();
 		themes.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"); // 30x x (aber 2px zu klein)
-
-		for (String theme : themeList)
-			themes.addItem(theme);
-
+		themeList.forEach(t -> themes.addItem(t));
 		themes.setSelectedItem(themeList.get(Integer.parseInt(dataHandler.getFromConfig("current_theme"))));
 
 		// TODO: px-Reihe rechts & unten von Pfeilkasten entfernen

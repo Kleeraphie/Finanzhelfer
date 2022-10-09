@@ -76,11 +76,10 @@ public class SaveCategory extends JPanel {
 		c.gridy = 0;
 		c.gridx = 1;
 
-		saveOpt = new JComboBox<String>();
+		saveOpt = new JComboBox<>();
 		saveOpt.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"); // 30x x (aber 2px zu klein)
 
-		for (String current : save_opts)
-			saveOpt.addItem(current);
+		save_opts.forEach(option -> saveOpt.addItem(option));
 
 		saveOpt.setSelectedIndex(tempSaveOpt); // akt. Speicheropt.
 

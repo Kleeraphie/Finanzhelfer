@@ -8,8 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -45,18 +43,18 @@ public class MainWindow extends JFrame {
 	private GridBagConstraints c;
 	private DataHandler dataHandler;
 	private Dimension screenSize;
-	private GridBagLayout layout;
 
 	public MainWindow() {
 
 		// TODO: alle Fenster gleich groß
-
 		theme = Main.theme;
 		dataHandler = Main.dataHandler;
 
 		c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.weighty = 1;
 		
 		screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // nur für Übungszwecke
 
@@ -72,8 +70,8 @@ public class MainWindow extends JFrame {
 	}
 
 	private void buildWindow() {
-		
-		layout = new GridBagLayout();
+
+		GridBagLayout layout = new GridBagLayout();
 
 		setTitle(dataHandler.getText("windows.main.title"));
 		setExtendedState(MAXIMIZED_BOTH);
@@ -97,13 +95,10 @@ public class MainWindow extends JFrame {
 	private void buildTaskBar() {
 		JPanel taskBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JButton createFH, switchFH, settings, newTransaction, listTransactions;
-		boolean multFHs = Main.fhm.fhList.size() >= 2;
 
 		c.gridx = 0;
 		c.gridy = 0;
 		c.gridwidth = 2;
-		c.weightx = 1;
-		c.weighty = 1;
 
 		// TODO: vllt. andere Aufteilung der Btns wenn kein FH vorhanden
 		// TODO: taskBar height wieder so wie früher
@@ -120,14 +115,13 @@ public class MainWindow extends JFrame {
 		createFH.setPreferredSize(new Dimension(50, 50));
 		createFH.setToolTipText(dataHandler.getText("windows.main.buttons.createFH"));
 		createFH.addActionListener(e -> new FinanzhelferCreator());
-
 		createFH.setContentAreaFilled(false);
 		createFH.setOpaque(true);
 		createFH.setBackground(theme.getButtonColor());
 
 		taskBar.add(createFH);
 
-		if (multFHs) {
+		if (Main.fhm.fhList.size() >= 2) {
 			switchFH = new JButton("W");
 			switchFH.setPreferredSize(new Dimension(50, 50));
 			switchFH.setToolTipText(dataHandler.getText("windows.main.buttons.switchFH"));
@@ -145,11 +139,9 @@ public class MainWindow extends JFrame {
 
 		try {
 			Image icon = ImageIO.read(new File("src/main/java/de/kleeraphie/finanzhelfer/graphics/settings.png"));
-
 			settings.setIcon(new ImageIcon(icon));
-
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 		settings.setContentAreaFilled(false);
@@ -158,41 +150,26 @@ public class MainWindow extends JFrame {
 
 		taskBar.add(settings);
 
-		if (Main.fhm.getStandard() != null) {
+		if (Main.fhm.getCurrent() == null)
+			return;
 
-			newTransaction = new JButton("N");
-			newTransaction.setPreferredSize(new Dimension(50, 50));
+		newTransaction = new JButton("N");
+		newTransaction.setPreferredSize(new Dimension(50, 50));
+		newTransaction.setToolTipText(dataHandler.getText("windows.main.buttons.newTransaction"));
+		newTransaction.addActionListener(e -> new AusgabenAdder());
+		newTransaction.setContentAreaFilled(false);
+		newTransaction.setOpaque(true);
+		newTransaction.setBackground(theme.getButtonColor());
+		taskBar.add(newTransaction);
 
-			if (multFHs)
-				newTransaction.setLocation(250, 25);
-			else
-				newTransaction.setLocation(175, 25);
-
-			newTransaction.setToolTipText(dataHandler.getText("windows.main.buttons.newTransaction"));
-			newTransaction.addActionListener(e -> new AusgabenAdder());
-
-			newTransaction.setContentAreaFilled(false);
-			newTransaction.setOpaque(true);
-			newTransaction.setBackground(theme.getButtonColor());
-			taskBar.add(newTransaction);
-
-			listTransactions = new JButton("L");
-			listTransactions.setPreferredSize(new Dimension(50, 50));
-
-			if (multFHs)
-				listTransactions.setLocation(325, 25);
-			else
-				listTransactions.setLocation(250, 25);
-
-			listTransactions.setToolTipText(dataHandler.getText("windows.main.buttons.listTransactions"));
-			listTransactions.addActionListener(e -> new TransactionList());
-
-			listTransactions.setContentAreaFilled(false);
-			listTransactions.setOpaque(true);
-			listTransactions.setBackground(theme.getButtonColor());
-			taskBar.add(listTransactions);
-
-		}
+		listTransactions = new JButton("L");
+		listTransactions.setPreferredSize(new Dimension(50, 50));
+		listTransactions.setToolTipText(dataHandler.getText("windows.main.buttons.listTransactions"));
+		listTransactions.addActionListener(e -> new TransactionList());
+		listTransactions.setContentAreaFilled(false);
+		listTransactions.setOpaque(true);
+		listTransactions.setBackground(theme.getButtonColor());
+		taskBar.add(listTransactions);
 
 	}
 
@@ -200,14 +177,12 @@ public class MainWindow extends JFrame {
 		JPanel minorGraphs;
 		ChartPanel result;
 		DefaultPieDataset<String> dataset;
-		JFreeChart chart;
-		RingPlot plot;
 		double used;
 		GridBagConstraints cGraphs;
 		JLabel name;
 
 		c.gridwidth = 1;
-		c.insets = new Insets(100, 100, 0, 200); // TODO: vllt. links nur 100
+		c.insets = new Insets(100, 100, 0, 200);
 		
 		cGraphs = new GridBagConstraints();
 
@@ -223,33 +198,7 @@ public class MainWindow extends JFrame {
 				used += p.getCost();
 			}
 		}
-		dataset.setValue("Verbraucht", Math.abs(used));
-
-		chart = ChartFactory.createRingChart(null, dataset, false, true, false);
-		plot = (RingPlot) chart.getPlot();
-
-		plot.setShadowPaint(Color.BLACK);
-		plot.setSimpleLabels(true);
-
-		plot.setLabelBackgroundPaint(theme.getBackgroundColor());
-		plot.setBackgroundPaint(theme.getBackgroundColor());
-		plot.setLabelOutlinePaint(null);
-		plot.setLabelShadowPaint(null);
-
-		plot.setSectionDepth(0.50);
-		plot.setSectionOutlinesVisible(false);
-		plot.setSeparatorsVisible(false);
-
-		plot.setIgnoreZeroValues(true);
-
-		plot.setNoDataMessage("No data available");
-		plot.setSectionDepth(0.08);
-		plot.setCircular(true);
-		plot.setLabelGap(0.50);
-
-		plot.setOutlineVisible(false);
-		
-		result = new ChartPanel(chart);
+		result = createRingChart(dataset, used);
 		result.setPreferredSize(new Dimension(1000, 800));
 		
 		add(result, c);
@@ -286,58 +235,20 @@ public class MainWindow extends JFrame {
 			name.setPreferredSize(new Dimension(300, 20));
 			// TODO: Text soll ein paar Pixel nach unten
 			
-			dataset = new DefaultPieDataset<String>();
+			dataset = new DefaultPieDataset<>();
 			dataset.setValue("Übrig", cat.getMoneyLeft());
 
 			for (Zahlung p : cat.getPayments())
 				used += p.getCost();
-			dataset.setValue("Verbraucht", Math.abs(used));
 
-			chart = ChartFactory.createRingChart(null, dataset, false, true, false);
-			plot = (RingPlot) chart.getPlot();
-
-			plot.setShadowPaint(Color.BLACK);
-			plot.setSimpleLabels(true);
-
-			plot.setLabelBackgroundPaint(theme.getBackgroundColor());
-			plot.setBackgroundPaint(theme.getBackgroundColor());
-			plot.setLabelOutlinePaint(null);
-			plot.setLabelShadowPaint(null);
-
-			plot.setSectionDepth(0.50);
-			plot.setSectionOutlinesVisible(false);
-			plot.setSeparatorsVisible(false);
-
-			plot.setIgnoreZeroValues(true);
-
-			plot.setNoDataMessage("No data available");
-			plot.setSectionDepth(0.08);
-			plot.setCircular(true);
-			plot.setLabelGap(0.50);
-
-			plot.setOutlineVisible(false);
-			
-			result = new ChartPanel(chart);
+			result = createRingChart(dataset, used);
 			result.setPreferredSize(new Dimension(300, 200));
-			
-			
-			if (cGraphs.gridx == 0) {
-				if (cGraphs.gridy == 0) {
-			name.setBorder(BorderFactory.createMatteBorder(2, 2, 0, 2, theme.getTaskBarColor()));
-			result.setBorder(BorderFactory.createMatteBorder(0, 2, 2, 2, theme.getTaskBarColor()));
-				} else {
-					name.setBorder(BorderFactory.createMatteBorder(0, 2, 0, 2, theme.getTaskBarColor()));
-					result.setBorder(BorderFactory.createMatteBorder(0, 2, 2, 2, theme.getTaskBarColor()));
-				}
-			} else {
-				if (cGraphs.gridy == 0) {
-				name.setBorder(BorderFactory.createMatteBorder(2, 0, 0, 2, theme.getTaskBarColor()));
-				result.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 2, theme.getTaskBarColor()));
-				} else {
-					name.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, theme.getTaskBarColor()));
-					result.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 2, theme.getTaskBarColor()));
-				}
-			}
+
+			int top = cGraphs.gridy == 0 ? 2 : 0;
+			int left = cGraphs.gridx == 0 ? 2 : 0;
+
+			name.setBorder(BorderFactory.createMatteBorder(top, left, 0, 2, theme.getTaskBarColor()));
+			result.setBorder(BorderFactory.createMatteBorder(0, left, 2, 2, theme.getTaskBarColor()));
 			
 			minorGraphs.add(name, cGraphs);
 			cGraphs.gridy++;
@@ -353,15 +264,49 @@ public class MainWindow extends JFrame {
 
 	}
 
+	private ChartPanel createRingChart(DefaultPieDataset<String> dataset, double used) {
+		JFreeChart chart;
+		RingPlot plot;
+		ChartPanel result;
+		dataset.setValue("Verbraucht", Math.abs(used));
+
+		chart = ChartFactory.createRingChart(null, dataset, false, true, false);
+		plot = (RingPlot) chart.getPlot();
+
+		plot.setShadowPaint(Color.BLACK);
+		plot.setSimpleLabels(true);
+
+		plot.setLabelBackgroundPaint(theme.getBackgroundColor());
+		plot.setBackgroundPaint(theme.getBackgroundColor());
+		plot.setLabelOutlinePaint(null);
+		plot.setLabelShadowPaint(null);
+
+		plot.setSectionDepth(0.50);
+		plot.setSectionOutlinesVisible(false);
+		plot.setSeparatorsVisible(false);
+
+		plot.setIgnoreZeroValues(true);
+
+		plot.setNoDataMessage("No data available");
+		plot.setSectionDepth(0.08);
+		plot.setCircular(true);
+		plot.setLabelGap(0.50);
+
+		plot.setOutlineVisible(false);
+
+		result = new ChartPanel(chart);
+		return result;
+	}
+
 	public void refresh() {
 
 		Main.dataHandler = new DataHandler();
-		Main.theme = dataHandler.getThemeByID(Integer.parseInt(dataHandler.getFromConfig("current_theme")));
-
-		getContentPane().removeAll();
 		dataHandler = Main.dataHandler;
+
+		Main.theme = dataHandler.getThemeByID(Integer.parseInt(dataHandler.getFromConfig("current_theme")));
 		theme = Main.theme;
 
+		getContentPane().removeAll();
 
 		// TODO: Bug: Fenster nicht mehr maximiert
 		buildTaskBar();
