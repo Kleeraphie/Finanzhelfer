@@ -7,7 +7,7 @@ public class Dauerauftrag {
 
 	private Zahlung payment;
 	private int delay;
-	private LocalDateTime timer;
+	private String timer;
 	private ChronoUnit unit;
 
 	public Dauerauftrag(Zahlung payment, int delay, ChronoUnit unit) {
@@ -15,15 +15,15 @@ public class Dauerauftrag {
 		this.delay = delay;
 		this.unit = unit;
 
-		this.timer = LocalDateTime.now().plus(delay, unit);
+		this.timer = LocalDateTime.now().plus(delay, unit).truncatedTo(ChronoUnit.SECONDS).toString();
 	}
 
 	public void addDelay() {
-		timer = timer.plus(delay, unit);
+		timer = LocalDateTime.parse(timer).plus(delay, unit).toString();
 	}
 
 	public boolean hasHappened() {
-		return ChronoUnit.DAYS.between(timer, LocalDateTime.now()) >= 0;
+		return ChronoUnit.DAYS.between(LocalDateTime.parse(timer), LocalDateTime.now()) >= 0;
 	}
 
 	public Zahlung getPayment() {
@@ -51,11 +51,11 @@ public class Dauerauftrag {
 	}
 
 	public LocalDateTime getTimer() {
-		return timer;
+		return LocalDateTime.parse(timer);
 	}
 
 	public void setTimer(LocalDateTime timer) {
-		this.timer = timer;
+		this.timer = timer.toString();
 	}
 	
 	@Override

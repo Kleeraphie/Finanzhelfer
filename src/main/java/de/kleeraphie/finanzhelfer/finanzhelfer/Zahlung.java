@@ -2,19 +2,20 @@ package de.kleeraphie.finanzhelfer.finanzhelfer;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 public class Zahlung {
 
 	private String name, info;
 	private double cost;
-	private final LocalDateTime CREATION_DATE;
+	private final String CREATION_DATE;
 
 	public Zahlung(String name, String info, double cost) {
 		this.name = name;
 		this.info = info;
 		this.cost = cost;
 
-		CREATION_DATE = LocalDateTime.now(ZoneId.systemDefault());
+		CREATION_DATE = LocalDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS).toString();
 	}
 
 	public Zahlung(String name, double cost) {
@@ -46,7 +47,7 @@ public class Zahlung {
 	}
 
 	public LocalDateTime getCreationDate() {
-		return CREATION_DATE;
+		return LocalDateTime.parse(CREATION_DATE);
 	}
 
 	@Override
