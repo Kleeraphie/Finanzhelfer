@@ -45,7 +45,7 @@ windows:
             nameAndCategoriesEmpty: In den Feldern "Name" & "Anzahl an Kategorien" ist kein Wert eingetragen. \nDiese Felder benötigen einen Wert!
             nameEmpty: In dem Feld "Name" ist kein Wert eingetragen. \nDieses Feld benötigt einen Wert!
             moneyEmpty: In dem Feld "Gehalt" ist kein Wert eingetragen. \nDieses Feld benötigt einen Wert!
-            categoriesEmpty: In dem Feld "Anzahl an Kategorien" ist kein Wert eingetragen. \nDieses Feld benötigt einen Wert ( > 0)!
+            categoriesEmpty: In dem Feld "Anzahl an Kategorien" ist kein Wert eingetragen. \nDieses Feld benötigt einen Wert > 0!
             notNatural: Das Feld "Anzahl an Kategorien" muss eine natürliche Zahl beinhalten!
             notPositive: In dem Feld "Anzahl an Kategorien" muss ein Wert > 0 eingetragen werden!
             moneyNegative: In dem Feld "Gehalt" muss ein Wert >= 0 eingetragen werden!
@@ -110,6 +110,7 @@ windows:
         dialogues:
             toExpensive: Diese Ausgabe übersteigt das verbleibende Geld dieser Kategorie! (%s %s > %s %s)
             error: Fehler!
+            notPositive: In dem Feld "%s" muss ein Wert > 0 eingetragen werden!
 
 categories:
     general:

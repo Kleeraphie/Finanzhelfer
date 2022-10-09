@@ -284,40 +284,34 @@ public class AusgabenAdder extends JFrame {
 		finish.setOpaque(true);
 		finish.setBackground(theme.getButtonColor());
 
-		finish.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				addAusgabe();
-			}
-		});
+		finish.addActionListener(e -> addAusgabe());
 		add(finish, c);
 	}
 
 	private void addAusgabe() {
 		Kategorie currentCategory = Main.fhm.getCurrent().getCategoryByName((String) categories.getSelectedItem());
 		double money = Double.parseDouble(cost.getText().replace(".", "").replace(',', '.').replace('€', ' '));
-
-		if (types.getSelectedItem().toString().equals("Ausgabe")) {
-			money  *= -1;
-		}
-			
-		
 		Zahlung payment = new Zahlung(name.getText(), info.getText(), money);
-		
-		if (money > currentCategory.getMoneyLeft()) {
-			String message = String.format(dataHandler.getText("windows.add.dialogues.toExpensive"), money, dataHandler.getText("currency.symbol1"), currentCategory.getMoneyLeft(), dataHandler.getText("currency.symbol1"));
-
-			JOptionPane.showMessageDialog(this, message, dataHandler.getText("windows.add.dialogues.error"), JOptionPane.WARNING_MESSAGE);
-
-			return;
-		}
-
 		String selected = String.valueOf(categories.getSelectedItem());
 		Kategorie current = Main.fhm.getCurrent().getCategoryByName(selected);
 
+		if (types.getSelectedItem().toString().equals("Ausgabe"))
+			money  *= -1;
+		
+		if (money > currentCategory.getMoneyLeft()) {
+			String message = String.format(dataHandler.getText("windows.add.dialogues.toExpensive"), money, dataHandler.getText("currency.symbol1"), currentCategory.getMoneyLeft(), dataHandler.getText("currency.symbol1"));
+			JOptionPane.showMessageDialog(this, message, dataHandler.getText("windows.add.dialogues.error"), JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
 		if (timesTypes.getSelectedItem().toString().equals(dataHandler.getText("windows.add.types.order"))) {
 			int delay = ((int) ((JFormattedTextField) howOftenEntries.getComponent(1)).getValue());
+
+			if (delay <= 0) {
+				String message = String.format(dataHandler.getText("windows.add.dialogues.notPositive"), dataHandler.getText("windows.add.labels.howOften").replace(":", ""));
+				JOptionPane.showMessageDialog(this, message, dataHandler.getText("windows.add.dialogues.error"), JOptionPane.WARNING_MESSAGE);
+				return;
+			}
 
 			switch (unit.getSelectedItem().toString()) {
 
